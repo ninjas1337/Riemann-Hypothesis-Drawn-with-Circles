@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Prime Gearbox</title>
+<meta name="description" content="A virtual mechanical machine: a prime-driven shaft, a smooth shaft cut to the prime number theorem, and a controller made of zeta-zero oscillators, compared in a differential.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Prime Gearbox">
+<meta property="og:description" content="Primes drive one shaft, the prime number theorem drives another, and the zeta zeros steer the difference. A virtual machine for the Riemann Hypothesis.">
+<meta property="og:url" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/machine.html">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Single-theme by choice: an engineering blueprint. Machine canvas on top, recorder and pole diagram below, prose after. */
+  --bp:#0f2a47;          /* blueprint paper */
+  --bp-deep:#0b2039;
+  --ink:#e8eef5;         /* chalk lines */
+  --muted:#9fb3c8;
+  --grid:#1f4268;
+  --brass:#d9a441;       /* moving parts */
+  --prime:#f08a4b;       /* prime shaft, ahead */
+  --smooth:#7fc4e8;      /* smooth shaft */
+  --ctrl:#a7e3a1;        /* controller */
+  --font-display:"Source Serif 4", Georgia, serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bp-deep);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:22px}
+.back{font-size:.9rem;color:var(--smooth)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.9rem,5vw,2.8rem);line-height:1.1;margin:4px 0 8px;text-wrap:balance}
+h1 em{color:var(--brass);font-weight:400}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.5rem;margin:0}
+p{margin:0;max-width:72ch}
+.lede{color:var(--muted);font-size:1.08rem}
+.sheet{background:var(--bp);border:1px solid var(--grid);border-radius:10px;padding:12px;display:grid;gap:10px}
+canvas{display:block;width:100%;border-radius:6px;background:var(--bp);touch-action:pan-y}
+#machine{aspect-ratio:2.05/1}
+#rec{aspect-ratio:4.2/1}
+#poles{aspect-ratio:1/1.15;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.92rem}
+.row label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--brass);width:min(230px,100%)}
+button{font:inherit;font-size:.88rem;border:1px solid var(--grid);background:var(--bp-deep);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--brass)}
+button.on{background:var(--brass);border-color:var(--brass);color:var(--bp-deep);font-weight:700}
+button:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.two{display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:760px){.two{grid-template-columns:1fr}#poles{aspect-ratio:1.3/1}}
+.read{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:760px){.read{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cell{border:1px solid var(--grid);border-radius:6px;padding:6px 9px;background:var(--bp-deep)}
+.cell .k{font-size:.74rem;color:var(--muted)}
+.cell .v{font-family:var(--font-mono);font-size:.98rem;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:999px;background:var(--grid);color:var(--ink)}
+.chip.ahead{background:var(--prime);color:var(--bp-deep);font-weight:700}
+.cap{font-size:.85rem;color:var(--muted)}
+.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.part{border-top:3px solid var(--grid);padding-top:8px}
+.part h3{margin:0 0 4px;font-size:1.02rem}
+.callout{border-left:4px solid var(--brass);background:var(--bp);padding:12px 16px;border-radius:0 8px 8px 0;max-width:72ch}
+footer{border-top:1px solid var(--grid);padding-top:16px;font-size:.85rem;color:var(--muted);display:grid;gap:8px}
+footer ol{margin:0;padding-left:20px}
+a{color:var(--smooth)}
+</style>
+</head>
+<body>
+<main>
+<div>
+  <a class="back" href="index.html">← The Riemann Hypothesis, drawn with circles</a>
+  <h1>The Prime <em>Gearbox</em></h1>
+  <p class="lede">A virtual machine with three shafts. The primes drive one in jerks, the prime number theorem drives another smoothly, and a controller built from the zeros of the zeta function tries to make up the difference. A differential measures the slip that is left.</p>
+</div>
+
+<div class="sheet">
+  <canvas id="machine" role="img" aria-label="Animated gearbox: sieve gears, prime shaft, smooth cam shaft, zeta-zero controller and differential with slip needle"></canvas>
+  <div class="row">
+    <button id="run" class="on" type="button">Pause</button>
+    <label for="speed">Speed <input id="speed" type="range" min="0" max="100" value="38"></label>
+    <span class="cap">Jump to</span>
+    <button type="button" data-y="100">y = 100</button>
+    <button type="button" data-y="10000">10⁴</button>
+    <button type="button" data-y="1000000">10⁶</button>
+    <button type="button" data-y="3">restart</button>
+  </div>
+  <div class="row">
+    <label for="K">Controller oscillators (zeros): <input id="K" type="range" min="0" max="138" value="0"> <b id="Kv" style="font-family:var(--font-mono)">0</b></label>
+    <label for="off"><input id="off" type="checkbox"> Offset gear (−2/3, squares of primes)</label>
+  </div>
+  <div class="read">
+    <div class="cell"><div class="k">Current prime y</div><div class="v" id="r-y">–</div></div>
+    <div class="cell"><div class="k">Prime shaft (chain position)</div><div class="v" id="r-x">–</div></div>
+    <div class="cell"><div class="k">Smooth shaft 2·li(y²) − y − 3</div><div class="v" id="r-s">–</div></div>
+    <div class="cell"><div class="k">Controller output</div><div class="v" id="r-c">–</div></div>
+    <div class="cell"><div class="k">Slip <span class="chip" id="r-chip">–</span></div><div class="v" id="r-slip">–</div></div>
+  </div>
+</div>
+
+<div class="two">
+  <div class="sheet">
+    <canvas id="rec" role="img" aria-label="Chart recorder: wobble without controller and slip with controller, against the logarithm of the prime size"></canvas>
+    <p class="cap"><span style="color:var(--muted)">Grey pen:</span> the raw wobble, prime shaft minus smooth shaft. <span style="color:var(--ctrl)">Green pen:</span> the slip after the controller. <span style="color:var(--prime)">Orange:</span> moments the prime shaft is ahead. Both scaled by y<sup>1.5</sup>/ln y, so the band the Riemann Hypothesis allows stays the same width. Horizontal axis: ln y.</p>
+  </div>
+  <div class="sheet">
+    <canvas id="poles" tabindex="0" role="img" aria-label="Pole diagram of the controller. Drag the first pole left or right."></canvas>
+    <div class="row"><label for="beta">First pole β: <input id="beta" type="range" min="0.5" max="0.6" step="0.001" value="0.5"> <b id="betav" style="font-family:var(--font-mono)">0.500</b></label></div>
+    <p class="cap">Controller poles at (β − ½) + iγ. The dashed line is the stability boundary. Drag the first pole to the right and watch the slip.</p>
+  </div>
+</div>
+
+<section style="display:grid;gap:12px">
+  <h2>How the machine works</h2>
+  <div class="parts">
+    <div class="part"><h3 style="color:var(--brass)">1 · Sieve gears</h3><p>Gears with 2, 3, 5, 7, 11 and 13 teeth turn one tooth per number. A gear blocks the light beam when its mark points up, which happens when the number is divisible by its tooth count. When all marks are away, the beam passes. (Six gears certify primes up to 168; beyond that the machine reads the primes from a table.)</p></div>
+    <div class="part"><h3 style="color:var(--prime)">2 · Prime shaft</h3><p>A ratchet advances one tooth per prime and moves the shaft forward by 2√(p·q), the step to the next touching circle. Its position is the circle chain from the explainer.</p></div>
+    <div class="part"><h3 style="color:var(--smooth)">3 · Smooth shaft</h3><p>A cam cut to the curve 2·li(y²) − y − 3 turns continuously: the prime number theorem as a piece of metal.</p></div>
+    <div class="part"><h3 style="color:var(--ctrl)">4 · Controller</h3><p>Wheels on wheels, one per zeta zero. Wheel k turns at speed γ<sub>k</sub> in log-time ln y, with size 4/|ρ<sub>k</sub> + 1|. Its shadow is the control signal. This is in spirit the machine Alan Turing began to cut in brass in 1939.</p></div>
+    <div class="part"><h3 style="color:var(--ink)">5 · Differential</h3><p>Like the differential in a car axle, it outputs the difference between the prime shaft and the smooth shaft plus controller. The needle shows the slip.</p></div>
+  </div>
+</section>
+
+<section style="display:grid;gap:12px">
+  <h2>What you can see</h2>
+  <p>With the controller off, the needle shows the raw wobble of the primes: forward after dense clusters, back after big gaps, mostly a little behind. Switch on the offset gear and add oscillators one by one: the slip shrinks. With 138 zeros the controller follows the primes closely. Where it has to follow the sudden jump at a prime with only finitely many wheels, it overshoots by about 9 % (the Gibbs phenomenon).</p>
+  <div class="callout"><p><b>The Riemann Hypothesis, in machine language:</b> the system that produces the primes has all its poles on the stability boundary. Every zero is an undamped oscillator. In log-time u = ln y, the prime-power impulses Λ(n)·δ(u − ln n) have the Laplace transform Σ Λ(n)·n<sup>−s</sup> = −ζ′(s)/ζ(s): the zeta zeros are the poles of that transfer function. A pole to the right of the line would be an unstable mode, and the slip would grow without limit.</p></div>
+  <p>Move the first pole to the right and the controller grows a mode the real primes do not have: the slip runs away. Up to the range this machine can run, the primes only agree with poles on the line. That is a picture of the hypothesis, not a proof of it.</p>
+</section>
+
+<footer>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a>.</p>
+  <ol>
+    <li>D. H. Lehmer's mechanical sieves (bicycle chains 1926, gears 1932); see H. D. Huskey, “Derrick Henry Lehmer”, IEEE Computer Society pioneers.</li>
+    <li>A. M. Turing, application to the Royal Society for a zeta-function machine, 1939; D. A. Hejhal &amp; A. M. Odlyzko, “Alan Turing and the Riemann zeta function”.</li>
+    <li>H. Davenport, <i>Multiplicative Number Theory</i>, 3rd ed., Springer, 2000, ch. 17 (−ζ′/ζ and the explicit formula).</li>
+    <li>D. V. Widder, <i>The Laplace Transform</i>, Princeton Univ. Press, 1941 (Dirichlet series as Laplace transforms).</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+const ZEROS = __ZEROS__;
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const C={bp:"#0f2a47",deep:"#0b2039",ink:"#e8eef5",muted:"#9fb3c8",grid:"#1f4268",brass:"#d9a441",prime:"#f08a4b",smooth:"#7fc4e8",ctrl:"#a7e3a1"};
+const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- primes and the circle chain ---------- */
+const NMAX=5000000, sv=new Uint8Array(NMAX+1); const PR=[];
+for(let i=2;i<=NMAX;i++){ if(!sv[i]){ if(i>=3) PR.push(i); if(i*i<=NMAX) for(let j=i*i;j<=NMAX;j+=i) sv[j]=1; } }
+const NP=PR.length, P=Float64Array.from(PR), X=new Float64Array(NP);
+for(let k=1;k<NP;k++) X[k]=X[k-1]+2*Math.sqrt(P[k-1]*P[k]);
+const isPrime=n=>n>=2&&n<=NMAX&&!sv[n];
+function idx(y){let lo=0,hi=NP-1;if(y<P[0])return 0;while(lo<hi){const m=(lo+hi+1)>>1;if(P[m]<=y)lo=m;else hi=m-1;}return lo;}
+function li(x){const L=Math.log(x);let a=L,inner=1,s=a;for(let n=2;n<400;n++){a*=-L/(2*n);if(n%2===1)inner+=1/n;const t=a*inner;s+=t;if(Math.abs(t)<1e-17*Math.abs(s)&&n>L)break;}return 0.5772156649015329+Math.log(L)+Math.sqrt(x)*s;}
+const smooth=y=>2*li(y*y)-y-3;
+const scale=y=>Math.pow(y,1.5)/Math.log(y);
+
+/* ---------- state ---------- */
+let u=Math.log(3), running=!reduce, K=0, offset=false, beta=0.5;
+function wobble(y){const k=idx(y);return (X[k]-smooth(y))/scale(y);}
+function mode(k,uu){const g=ZEROS[k],den=2.25+g*g;let v=-4*(1.5*Math.cos(g*uu)+g*Math.sin(g*uu))/den;if(k===0&&beta>0.5)v*=Math.exp((beta-0.5)*uu);return v;}
+function control(uu){let s=offset?-2/3:0;for(let k=0;k<K;k++)s+=mode(k,uu);return s;}
+
+/* ---------- drawing helpers ---------- */
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
+function grid(g,w,h,step,col){g.strokeStyle=col;g.lineWidth=1;g.beginPath();for(let x=0;x<w;x+=step){g.moveTo(x,0);g.lineTo(x,h);}for(let y=0;y<h;y+=step){g.moveTo(0,y);g.lineTo(w,y);}g.stroke();}
+function gear(g,cx,cy,r,teeth,ang,col,lw){
+  const ro=r, ri=r*(teeth>12?0.9:0.82), n=teeth; g.beginPath();
+  for(let i=0;i<n;i++){const a0=ang+2*Math.PI*i/n, a1=a0+Math.PI/n*0.45, a2=a0+Math.PI/n*1.0, a3=a0+Math.PI/n*1.55;
+    const pts=[[ri,a0],[ro,a1],[ro,a2],[ri,a3]];
+    pts.forEach(([rr,aa],j)=>{const x=cx+rr*Math.cos(aa),y=cy+rr*Math.sin(aa);(i===0&&j===0)?g.moveTo(x,y):g.lineTo(x,y);});}
+  g.closePath(); g.strokeStyle=col; g.lineWidth=lw; g.stroke();
+  g.beginPath(); g.arc(cx,cy,r*0.22,0,2*Math.PI); g.stroke();
+}
+function label(g,s,x,y,col,size,al,base){g.fillStyle=col;g.font=size+"px "+MONO;g.textAlign=al||"center";g.textBaseline=base||"middle";g.fillText(s,x,y);}
+function shaft(g,x1,y1,x2,y2,col,d){g.strokeStyle=col;g.lineWidth=3*d;g.setLineDash([]);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+  const a=Math.atan2(y2-y1,x2-x1),L=9*d;g.fillStyle=col;g.beginPath();g.moveTo(x2,y2);g.lineTo(x2-L*Math.cos(a-0.4),y2-L*Math.sin(a-0.4));g.lineTo(x2-L*Math.cos(a+0.4),y2-L*Math.sin(a+0.4));g.closePath();g.fill();}
+
+/* ---------- the machine ---------- */
+function drawMachine(){
+  const {g,w,h,d}=fit($("machine"));
+  grid(g,w,h,22*d,C.grid);
+  const U=h/10, fs=Math.max(9,Math.round(U*0.32)), y=Math.exp(u), n=Math.floor(y), k=idx(y);
+  // --- 1. sieve gears (left column)
+  const SP=[2,3,5,7,11,13], sx=U*1.25; let open=true;
+  label(g,"SIEVE",sx,U*0.55,C.brass,fs,"center");
+  SP.forEach((p,i)=>{const cy=U*(1.35+i*1.38), r=U*0.52, ph=n%p, ang=-Math.PI/2+2*Math.PI*ph/p;
+    const block=ph===0&&n!==p; if(block) open=false;
+    gear(g,sx,cy,r,Math.max(p,6),ang+Math.PI/Math.max(p,6),block?C.prime:C.brass,1.4*d);
+    g.fillStyle=block?C.prime:C.ink; const mx=sx+r*0.62*Math.cos(ang), my=cy+r*0.62*Math.sin(ang); g.beginPath(); g.arc(mx,my,3*d,0,2*Math.PI); g.fill();
+    label(g,String(p),sx-r-U*0.32,cy,C.muted,fs*0.9,"right");});
+  const prime=isPrime(n);
+  g.strokeStyle=prime?C.ctrl:"rgba(167,227,161,0.18)"; g.lineWidth=(prime?3:1.5)*d; g.setLineDash(prime?[]:[4*d,4*d]);
+  g.beginPath(); g.moveTo(sx+U*0.7,U*0.95); g.lineTo(sx+U*0.7,U*9.5); g.stroke(); g.setLineDash([]);
+  label(g,"n = "+n.toLocaleString("en"),sx,U*9.65,C.ink,fs,"center");
+  label(g,prime?"PRIME":"",sx+U*0.7,U*0.75,C.ctrl,fs*0.9,"center");
+
+  // --- 2. prime shaft (ratchet)
+  const px=U*4.0, py=U*2.6, pr=U*1.35;
+  gear(g,px,py,pr,30,-Math.PI/2+2*Math.PI*(k%30)/30,C.prime,2*d);
+  g.strokeStyle=C.prime; g.lineWidth=2*d; g.beginPath(); g.moveTo(px+pr*1.25,py-pr*0.85); g.lineTo(px+pr*0.72,py-pr*0.62); g.stroke(); // pawl
+  label(g,"PRIME SHAFT",px,py-pr-U*0.35,C.prime,fs,"center");
+  label(g,"+2√(pq) per prime",px,py+pr+U*0.35,C.muted,fs*0.85,"center");
+  // --- 3. smooth shaft (cam)
+  const cx=U*4.0, cy=U*7.0, cr=U*1.05, cang=u*2.2;
+  g.strokeStyle=C.smooth; g.lineWidth=2*d; g.beginPath();
+  for(let i=0;i<=120;i++){const a=2*Math.PI*i/120, rr=cr*(0.55+0.45*Math.pow(0.5+0.5*Math.sin(a),3)); const x2=cx+rr*Math.cos(a+cang), y2=cy+rr*Math.sin(a+cang); i?g.lineTo(x2,y2):g.moveTo(x2,y2);} g.closePath(); g.stroke();
+  g.beginPath(); g.arc(cx,cy,cr*0.15,0,2*Math.PI); g.stroke();
+  let fr=0; for(let i=0;i<120;i++){const a=2*Math.PI*i/120, rr=cr*(0.55+0.45*Math.pow(0.5+0.5*Math.sin(a),3)), yy=cy+rr*Math.sin(a+cang); fr=Math.min(fr,yy-cy);} // follower on top
+  g.beginPath(); g.moveTo(cx,cy+fr-1*d); g.lineTo(cx,cy+fr-U*0.5); g.stroke();
+  g.beginPath(); g.arc(cx,cy+fr-1*d,3*d,0,2*Math.PI); g.fillStyle=C.smooth; g.fill();
+  label(g,"SMOOTH SHAFT",cx,cy+cr+U*0.45,C.smooth,fs,"center");
+  label(g,"cam: 2·li(y²) − y − 3",cx,cy+cr+U*0.85,C.muted,fs*0.85,"center");
+  // --- 4. controller (epicycles of the zeros)
+  const ex=U*9.2, ey=U*5.0, nShow=Math.min(K,10);
+  label(g,"CONTROLLER",ex,U*0.55,C.ctrl,fs,"center");
+  label(g,K?K+" zeta-zero oscillators":"switched off",ex,U*0.95,C.muted,fs*0.85,"center");
+  let ox=ex-U*1.6, oy=ey, scl=U*2.6;
+  if(K===0){ g.strokeStyle="rgba(167,227,161,0.35)"; g.setLineDash([4*d,4*d]); g.beginPath(); g.arc(ex,ey,U*1.2,0,2*Math.PI); g.stroke(); g.setLineDash([]); }
+  for(let j=0;j<nShow;j++){const gm=ZEROS[j], amp=4/Math.hypot(1.5,gm)*(j===0&&beta>0.5?Math.exp((beta-0.5)*u):1), rr=amp*scl, ph=gm*u;
+    g.strokeStyle="rgba(167,227,161,0.5)"; g.lineWidth=1*d; g.beginPath(); g.arc(ox,oy,rr,0,2*Math.PI); g.stroke();
+    const nx=ox+rr*Math.cos(ph), ny=oy-rr*Math.sin(ph); g.strokeStyle=C.ctrl; g.lineWidth=1.6*d; g.beginPath(); g.moveTo(ox,oy); g.lineTo(nx,ny); g.stroke(); ox=nx; oy=ny;}
+  if(K>0){ g.fillStyle=C.ctrl; g.beginPath(); g.arc(ox,oy,3.5*d,0,2*Math.PI); g.fill(); g.setLineDash([3*d,3*d]); g.strokeStyle="rgba(167,227,161,0.6)"; g.beginPath(); g.moveTo(ox,oy); g.lineTo(ox,U*8.6); g.stroke(); g.setLineDash([]); if(K>10) label(g,"+"+(K-10)+" smaller wheels",ex,U*8.95,C.muted,fs*0.8,"center"); }
+  // --- 5. differential
+  const dx=U*15.2, dy=U*5.0, dr=U*1.2;
+  g.strokeStyle=C.ink; g.lineWidth=2*d; g.beginPath(); g.ellipse(dx,dy,dr*1.25,dr,0,0,2*Math.PI); g.stroke();
+  const spin=u*3;
+  gear(g,dx-dr*0.55,dy,dr*0.42,14,spin,C.prime,1.6*d);
+  gear(g,dx+dr*0.55,dy,dr*0.42,14,-spin,C.smooth,1.6*d);
+  gear(g,dx,dy-dr*0.55,dr*0.32,10,spin*0.7,C.brass,1.4*d);
+  gear(g,dx,dy+dr*0.55,dr*0.32,10,-spin*0.7,C.brass,1.4*d);
+  label(g,"DIFFERENTIAL",dx,dy-dr-U*0.4,C.ink,fs,"center");
+  // shafts into the differential
+  shaft(g,px+pr+U*0.1,py,dx-dr*1.25,dy-U*0.35,C.prime,d);
+  shaft(g,cx+cr+U*0.15,cy,dx-dr*1.1,dy+U*0.55,C.smooth,d);
+  if(K>0||offset) shaft(g,ex+U*2.2,ey,dx-dr*1.3,dy+U*0.1,C.ctrl,d);
+  // slip dial
+  const yy=Math.exp(u), slip=wobble(yy)-control(u), dialX=dx, dialY=U*8.35, R=U*1.1;
+  g.strokeStyle=C.ink; g.lineWidth=1.5*d; g.beginPath(); g.arc(dialX,dialY,R,Math.PI,2*Math.PI); g.stroke();
+  for(let t=-2;t<=2;t++){const a=Math.PI*1.5+t*Math.PI/5.2; g.beginPath(); g.moveTo(dialX+R*0.86*Math.cos(a),dialY+R*0.86*Math.sin(a)); g.lineTo(dialX+R*Math.cos(a),dialY+R*Math.sin(a)); g.stroke(); label(g,String(t),dialX+R*1.18*Math.cos(a),dialY+R*1.18*Math.sin(a),C.muted,fs*0.75,"center");}
+  const sa=Math.PI*1.5+Math.max(-2.4,Math.min(2.4,slip))*Math.PI/5.2;
+  g.strokeStyle=slip>0?C.prime:C.brass; g.lineWidth=3*d; g.beginPath(); g.moveTo(dialX,dialY); g.lineTo(dialX+R*0.92*Math.cos(sa),dialY+R*0.92*Math.sin(sa)); g.stroke();
+  g.fillStyle=C.ink; g.beginPath(); g.arc(dialX,dialY,4*d,0,2*Math.PI); g.fill();
+  label(g,"SLIP",dialX,dialY+U*0.35,C.ink,fs,"center");
+  shaft(g,dx,dy+dr+U*0.05,dialX,dialY-R-U*0.05,C.ink,d);
+  // readouts
+  $("r-y").textContent=Math.round(P[k]).toLocaleString("en");
+  $("r-x").textContent=X[k].toExponential(4);
+  $("r-s").textContent=smooth(yy).toExponential(4);
+  $("r-c").textContent=(K||offset)?control(u).toFixed(3)+" × y^1.5/ln y":"off";
+  $("r-slip").textContent=slip.toFixed(3);
+  const ch=$("r-chip"); ch.textContent=slip>0?"ahead":"behind"; ch.classList.toggle("ahead",slip>0);
+}
+
+/* ---------- chart recorder ---------- */
+function drawRec(){
+  const {g,w,h,d}=fit($("rec"));
+  grid(g,w,h,18*d,C.grid);
+  const pad={l:34*d,r:10*d,t:10*d,b:22*d}, span=2.6, u1=Math.max(u,Math.log(3)+0.01), u0=Math.max(Math.log(3),u1-span);
+  const lo=-2.6, hi=1.4, Xp=v=>pad.l+(v-u0)/Math.max(1e-6,u1-u0)*(w-pad.l-pad.r), Yp=v=>pad.t+(hi-Math.max(lo,Math.min(hi,v)))/(hi-lo)*(h-pad.t-pad.b);
+  g.strokeStyle=C.muted; g.lineWidth=1*d; g.beginPath(); g.moveTo(pad.l,Yp(0)); g.lineTo(w-pad.r,Yp(0)); g.stroke();
+  label(g,"0",pad.l-6*d,Yp(0),C.muted,10*d,"right"); label(g,"+1",pad.l-6*d,Yp(1),C.muted,10*d,"right"); label(g,"−2",pad.l-6*d,Yp(-2),C.muted,10*d,"right");
+  const N=Math.round(Math.min(700,(w-pad.l-pad.r)/(1.5*d))); const W=new Float64Array(N), S=new Float64Array(N), Uu=new Float64Array(N);
+  for(let i=0;i<N;i++){const uu=u0+(u1-u0)*i/(N-1), yy=Math.exp(uu); Uu[i]=uu; W[i]=wobble(yy); S[i]=W[i]-control(uu);}
+  g.fillStyle="rgba(240,138,75,0.35)";
+  for(let i=0;i<N-1;i++) if(W[i]>0) g.fillRect(Xp(Uu[i]),pad.t,Math.max(1,Xp(Uu[i+1])-Xp(Uu[i])),h-pad.t-pad.b);
+  const pen=(A,col,lw)=>{g.strokeStyle=col;g.lineWidth=lw*d;g.beginPath();for(let i=0;i<N;i++){const x=Xp(Uu[i]),y=Yp(A[i]);i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();};
+  pen(W,"rgba(159,179,200,0.9)",1);
+  if(K>0||offset) pen(S,C.ctrl,1.6);
+  const step=u1-u0>1.2?0.5:0.25; for(let v=Math.ceil(u0/step)*step;v<=u1;v+=step) label(g,v.toFixed(2),Xp(v),h-pad.b+11*d,C.muted,10*d,"center");
+  g.fillStyle=C.brass; g.beginPath(); g.arc(Xp(u1),Yp(K||offset?S[N-1]:W[N-1]),4*d,0,2*Math.PI); g.fill();
+}
+
+/* ---------- pole diagram ---------- */
+function drawPoles(){
+  const {g,w,h,d}=fit($("poles"));
+  grid(g,w,h,18*d,C.grid);
+  const pad={l:30*d,r:12*d,t:16*d,b:26*d}, xr=0.12, g1=52;
+  const Xp=v=>pad.l+(v+xr)/(2*xr)*(w-pad.l-pad.r), Yp=v=>h-pad.b-v/g1*(h-pad.t-pad.b);
+  g.fillStyle="rgba(240,138,75,0.10)"; g.fillRect(Xp(0),pad.t,w-pad.r-Xp(0),h-pad.t-pad.b);
+  label(g,"unstable",(Xp(0)+w-pad.r)/2,pad.t+10*d,C.prime,10*d,"center");
+  label(g,"damped",(pad.l+Xp(0))/2,pad.t+10*d,C.muted,10*d,"center");
+  g.strokeStyle=C.ink; g.setLineDash([5*d,4*d]); g.lineWidth=1.4*d; g.beginPath(); g.moveTo(Xp(0),pad.t); g.lineTo(Xp(0),h-pad.b); g.stroke(); g.setLineDash([]);
+  label(g,"β = ½",Xp(0),h-pad.b+12*d,C.ink,10*d,"center");
+  label(g,"β − ½ →",w-pad.r,h-pad.b+12*d,C.muted,10*d,"right");
+  label(g,"γ ↑",pad.l+14*d,pad.t+26*d,C.muted,11*d,"center");
+  for(const v of [10,20,30,40,50]) label(g,String(v),pad.l-6*d,Yp(v),C.muted,9*d,"right");
+  ZEROS.slice(0,10).forEach((z,i)=>{const bx=i===0?beta-0.5:0, x=Xp(bx), y=Yp(z), s=5*d, on=i<K;
+    g.strokeStyle=i===0&&beta>0.5?C.prime:(on?C.ctrl:C.muted); g.lineWidth=2*d; g.beginPath(); g.moveTo(x-s,y-s); g.lineTo(x+s,y+s); g.moveTo(x-s,y+s); g.lineTo(x+s,y-s); g.stroke();});
+  if(beta>0.56) label(g,"14.13",Xp(beta-0.5)-10*d,Yp(ZEROS[0]),C.ink,10*d,"right"); else label(g,"14.13",Xp(beta-0.5)+10*d,Yp(ZEROS[0]),C.ink,10*d,"left");
+}
+
+/* ---------- loop and controls ---------- */
+function drawAll(){drawMachine();drawRec();drawPoles();}
+let last=0;
+function frame(ts){
+  if(running){const dt=last?Math.min(0.05,(ts-last)/1000):0; const sp=+$("speed").value; const rate=0.004*Math.pow(10,sp/33.3); u+=rate*dt; if(u>Math.log(P[NP-1])){u=Math.log(P[NP-1]);running=false;$("run").textContent="Run";$("run").classList.remove("on");}}
+  last=ts; drawAll(); requestAnimationFrame(frame);
+}
+$("run").addEventListener("click",function(){running=!running;this.textContent=running?"Pause":"Run";this.classList.toggle("on",running);last=0;});
+document.querySelectorAll("button[data-y]").forEach(b=>b.addEventListener("click",()=>{u=Math.log(+b.dataset.y);drawAll();}));
+$("K").addEventListener("input",function(){K=+this.value;$("Kv").textContent=K;drawAll();});
+$("off").addEventListener("change",function(){offset=this.checked;drawAll();});
+$("beta").addEventListener("input",function(){beta=+this.value;$("betav").textContent=beta.toFixed(3);drawAll();});
+// drag the first pole
+(function(){const c=$("poles");let drag=false;
+  const set=e=>{const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const pad=30*d, xr=0.12;const x=(e.clientX-r.left)*d;const v=(x-pad)/((c.width-pad-12*d))*2*xr-xr;beta=Math.min(0.6,Math.max(0.5,0.5+v));$("beta").value=beta;$("betav").textContent=beta.toFixed(3);drawAll();};
+  c.addEventListener("pointerdown",e=>{drag=true;c.setPointerCapture(e.pointerId);set(e);});
+  c.addEventListener("pointermove",e=>{if(drag)set(e);});
+  c.addEventListener("pointerup",()=>drag=false);
+  c.addEventListener("keydown",e=>{if(e.key==="ArrowRight"){beta=Math.min(0.6,beta+0.005);}else if(e.key==="ArrowLeft"){beta=Math.max(0.5,beta-0.005);}else return;e.preventDefault();$("beta").value=beta;$("betav").textContent=beta.toFixed(3);drawAll();});
+})();
+if(reduce){$("run").textContent="Run";$("run").classList.remove("on");}
+addEventListener("resize",drawAll);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
