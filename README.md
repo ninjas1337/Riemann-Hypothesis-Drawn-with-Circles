@@ -31,6 +31,12 @@ A virtual mechanical machine: Lehmer-style sieve gears feed a ratchet that moves
 
 Turning circles side by side. Left: a Fourier series of a square wave, whose speeds 1, 3, 5, … repeat; a wobble slider makes each circle pulse in size. Right: one circle per zeta zero, speed γ, fixed angle arctan(γ/1.5), never repeating; a β slider moves one zero off the critical line so its circle breathes like y^(β−½). The point: a periodically wobbling circle is just three steady circles (sidebands, r(1 + w sin Ωt)·sin mt = r sin mt + (rw/2)[cos((m−Ω)t) − cos((m+Ω)t)]), while a steadily growing circle has a complex speed, which is exactly what a zero with β ≠ ½ would be. RH: the music may wobble, but no circle breathes.
 
+## The Zeros on a Circle
+
+👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/tangent.html**
+
+Every zero ρ is sent to w = 1 − 1/ρ, which maps the critical line onto the unit circle: RH says every zero is exactly as far from 0 as from 1. Projected from −1 onto the tangent line at w = 1, each zero lands at height exactly 1/γ. A lean slider tilts the tangent line until every zero on the critical line collapses into the touching point, and a third panel shows Li's criterion (λₙ ≥ 0 for all n): powers wⁿ only turn on the circle but spiral out for a zero off the line, after about n ≈ γ²/(β − ½) steps.
+
 ## Mathematical background
 
 The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to
@@ -48,6 +54,7 @@ python3 scripts/compute_data.py   # zeros, circle chain up to 10^8, spectra (num
 python3 scripts/build_page.py     # embeds the data into index.html
 python3 scripts/build_machine.py  # embeds the zeros into machine.html
 python3 scripts/build_epicycles.py  # embeds the zeros into epicycles.html
+python3 scripts/build_tangent.py  # embeds the zeros into tangent.html
 ```
 
 ## Credits

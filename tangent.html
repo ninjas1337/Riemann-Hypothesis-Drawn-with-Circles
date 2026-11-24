@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Zeros on a Circle and a Tangent Line</title>
+<meta name="description" content="Send every zeta zero to the unit circle, then to the tangent line. The Riemann Hypothesis says every zero lands exactly on it. Lean the line, and watch Li's powers spiral.">
+<meta property="og:title" content="The Zeros on a Circle and a Tangent Line">
+<meta property="og:description" content="The Riemann Hypothesis restated: every zero is exactly as far from 0 as from 1.">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Blueprint theme shared with the Gearbox and Two Clockworks pages. One reading column; three drawing sheets, each with its controls and a live readout. */
+  --bp:#0f2a47; --deep:#0b2039; --ink:#e8eef5; --muted:#9fb3c8; --grid:#1f4268;
+  --brass:#d9a441; --line:#7fc4e8; --zeta:#a7e3a1; --hot:#f08a4b;
+  --font-display:"Source Serif 4", Georgia, serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--deep);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:26px}
+.back{font-size:.9rem;color:var(--line)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:4px 0 8px;text-wrap:balance}
+h1 em{color:var(--zeta);font-weight:400}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0;text-wrap:balance}
+p{margin:0;max-width:70ch}
+.lede{color:var(--muted);font-size:1.06rem}
+section{display:grid;gap:12px}
+.sheet{background:var(--bp);border:1px solid var(--grid);border-radius:10px;padding:12px;display:grid;gap:10px}
+canvas{display:block;width:100%;border-radius:6px;background:var(--bp)}
+#cvA{aspect-ratio:1.5/1} #cvB{aspect-ratio:3.2/1} #cvC{aspect-ratio:1.5/1}
+.row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.9rem}
+.row label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--brass);width:min(170px,100%)}
+select{font:inherit;font-size:.86rem;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:4px 8px}
+input:focus-visible,select:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.read{font-family:var(--font-mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;overflow-x:auto;white-space:pre-wrap}
+.formula{font-family:var(--font-mono);font-size:.95rem;background:var(--bp);border:1px solid var(--grid);border-radius:8px;padding:10px 14px;overflow-x:auto;max-width:70ch}
+.callout{border-left:4px solid var(--zeta);background:var(--bp);padding:12px 16px;border-radius:0 8px 8px 0;max-width:70ch}
+footer{border-top:1px solid var(--grid);padding-top:16px;font-size:.85rem;color:var(--muted);display:grid;gap:8px}
+footer ol{margin:0;padding-left:20px;display:grid;gap:4px}
+a{color:var(--line)}
+</style>
+</head>
+<body>
+<main>
+<div>
+  <a class="back" href="epicycles.html">← Two Clockworks</a>
+  <h1>The zeros on a circle, <em>and a tangent line</em></h1>
+  <p class="lede">Every zero of the zeta function can be moved onto one circle. The critical line becomes the unit circle, and the Riemann Hypothesis becomes a sentence about 0 and 1: every zero is exactly as far from 0 as it is from 1. Then send the circle to its tangent line, lean the line, and see why such a simple sentence is so hard to prove.</p>
+</div>
+
+<div class="row" style="font-size:.95rem">
+  <label for="nZ">Zeros shown <input id="nZ" type="range" min="1" max="138" value="30"> <b class="num" id="nZv">30</b></label>
+  <label for="which">Move zero <select id="which"></select></label>
+  <label for="beta">β <input id="beta" type="range" min="0.5" max="0.9" step="0.005" value="0.5"> <b class="num" id="betav">0.500</b></label>
+</div>
+
+<section>
+  <h2>1. One circle for all the zeros</h2>
+  <p>Send every zero ρ to the point <b>w = 1 − 1/ρ</b>. The critical line Re ρ = ½ lands exactly on the unit circle. A zero to the right of the line would land inside, one to the left outside. Each point on the circle is then sent to the tangent line at w = 1 along a straight ray from the opposite point −1.</p>
+  <div class="sheet">
+    <canvas id="cvA" role="img" aria-label="The unit circle with the zeros mapped onto it, and rays projecting them onto the tangent line at 1"></canvas>
+    <div class="row"><label for="zoom">Zoom into the touching point <input id="zoom" type="range" min="0" max="100" value="40"> <b class="num" id="zoomv"></b></label></div>
+    <p class="read" id="readA"></p>
+  </div>
+  <p>Why the circle? |w| = 1 means |ρ − 1| = |ρ|: the zero is as far from 1 as from 0. The points equally far from 0 and 1 form the perpendicular bisector of the segment between them, and that is the line Re s = ½.</p>
+  <div class="formula">RH  ⟺  |ρ − 1| = |ρ| for every zero ρ  ⟺  every w = 1 − 1/ρ lies on the unit circle</div>
+  <p>On the tangent line the zeros land at heights of exactly <b>±1/γ</b>: 0.0707 for the first zero, 0.0476 for the second, 0.0400 for the third, and so on, crowding into the touching point. In general the landing point is 1 − 1/(ρ − ½), which is on the tangent line exactly when ρ − ½ is purely imaginary.</p>
+</section>
+
+<section>
+  <h2>2. Leaning the tangent line</h2>
+  <p>Each landing point has two parts: a height along the line (1/γ) and a sideways offset (zero on the critical line, about (β − ½)/γ² off it). Lean the line by an angle φ and you read a mix of the two: height·cos φ + offset·sin φ. At 90° you look along the line, edge-on, like looking at the sphere from above on the <a href="https://ninjas1337.github.io/Imaginary-numbers-are-real/">complex numbers page</a>.</p>
+  <div class="sheet">
+    <canvas id="cvB" role="img" aria-label="The readings of all zeros on the leaned tangent line"></canvas>
+    <div class="row"><label for="lean">Lean φ <input id="lean" type="range" min="0" max="90" step="0.5" value="0"> <b class="num" id="leanv">0°</b></label></div>
+    <p class="read" id="readB"></p>
+  </div>
+  <p>Edge-on, every zero on the critical line collapses into the single touching point, and the Riemann Hypothesis becomes: <b>nothing sticks out of one point</b>. But a fixed lean only rotates the view. It never makes an off-line zero bigger, and its offset (β − ½)/γ² fades for high zeros.</p>
+</section>
+
+<section>
+  <h2>3. The tangency zone, and Li's magnifier</h2>
+  <p>Near the touching point the circle and its tangent line are only about 1/(2γ²) apart, and an off-line zero's distance from the circle shrinks the same way, about (β − ½)/γ². The higher a zero, the deeper it hides in the touching point. Xian-Jin Li found the way to magnify it: raise every w to the n-th power. On the circle wⁿ only turns. Off the circle it spirals.</p>
+  <div class="sheet">
+    <canvas id="cvC" role="img" aria-label="Powers of w for the chosen zero, on the circle and spiralling out if the zero is off the line"></canvas>
+    <div class="row"><label for="nPow">Power n up to <input id="nPow" type="range" min="1" max="6000" value="2500"> <b class="num" id="nPowv">2500</b></label></div>
+    <p class="read" id="readC"></p>
+  </div>
+  <p>Li's criterion adds up 1 − wⁿ over all zeros, a number λₙ. If every w is on the circle, each conjugate pair gives 2 − 2cos(nθ), never negative, so λₙ ≥ 0. Li proved the converse: RH holds exactly when λₙ ≥ 0 for every n. The first one is λ₁ = 1 + γ_E/2 − ½ ln 4π ≈ 0.0231 (γ_E is Euler's constant). Every λₙ computed so far is positive. The catch is visible above: a zero at height γ only starts to show at n ≈ γ²/(β − ½), so a hypothetical off-line zero at height 10¹² would hide until n ≈ 10²⁴. That is why the criterion must say <i>every</i> n.</p>
+  <div class="callout"><p>All the action happens at the touching point, where circle and line meet. That is the Riemann Hypothesis in miniature: an infinitely detailed question squeezed into the place where the gap goes to zero.</p></div>
+</section>
+
+<footer>
+  <p>Concept and questions: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="machine.html">The Prime Gearbox</a> · <a href="epicycles.html">Two Clockworks</a>. The first 138 zeros (up to height 300) are computed in <code>scripts/compute_data.py</code>.</p>
+  <ol>
+    <li>X.-J. Li, The positivity of a sequence of numbers and the Riemann hypothesis, <i>J. Number Theory</i> 65 (1997), 325–333.</li>
+    <li>E. Bombieri &amp; J. C. Lagarias, Complements to Li's criterion for the Riemann hypothesis, <i>J. Number Theory</i> 77 (1999), 274–287.</li>
+    <li>J. B. Keiper, Power series expansions of Riemann's ξ function, <i>Math. Comp.</i> 58 (1992), 765–773.</li>
+    <li>T. Needham, <i>Visual Complex Analysis</i>, Oxford University Press, 1997, ch. 3 (Möbius maps and the Cayley map).</li>
+    <li>D. Platt &amp; T. Trudgian, The Riemann hypothesis is true up to 3·10¹², <i>Bull. London Math. Soc.</i> 53 (2021), 792–797.</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+const ZEROS = [14.134725, 21.02204, 25.010858, 30.424876, 32.935062, 37.586178, 40.918719, 43.327073, 48.005151, 49.773832, 52.970321, 56.446248, 59.347044, 60.831779, 65.112544, 67.079811, 69.546402, 72.067158, 75.704691, 77.14484, 79.337375, 82.910381, 84.735493, 87.425275, 88.809111, 92.491899, 94.651344, 95.870634, 98.831194, 101.317851, 103.725538, 105.446623, 107.168611, 111.029536, 111.874659, 114.320221, 116.22668, 118.790783, 121.370125, 122.946829, 124.256819, 127.516684, 129.578704, 131.087689, 133.497737, 134.75651, 138.116042, 139.736209, 141.123707, 143.111846, 146.000982, 147.422765, 150.05352, 150.925258, 153.024694, 156.112909, 157.597592, 158.849988, 161.188964, 163.03071, 165.537069, 167.18444, 169.094515, 169.911976, 173.411537, 174.754192, 176.441434, 178.377408, 179.916484, 182.207078, 184.874468, 185.598784, 187.228923, 189.416159, 192.026656, 193.079727, 195.265397, 196.876482, 198.01531, 201.264752, 202.493595, 204.189672, 205.394697, 207.906259, 209.57651, 211.690863, 213.347919, 214.547045, 216.169539, 219.067596, 220.714919, 221.430706, 224.007, 224.983325, 227.421444, 229.337413, 231.250189, 231.987235, 233.693404, 236.52423, 237.76982, 239.555478, 241.049158, 242.823272, 244.070898, 247.13699, 248.10199, 249.57369, 251.014948, 253.069987, 255.306256, 256.380714, 258.610439, 259.874407, 260.805085, 263.573894, 265.557852, 266.614974, 267.921915, 269.970449, 271.494056, 273.459609, 275.587493, 276.45205, 278.250744, 279.229251, 282.465115, 283.211186, 284.835964, 286.667445, 287.911921, 289.579855, 291.846291, 293.558434, 294.96537, 295.573255, 297.979277, 299.840326];
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const C={bp:"#0f2a47",ink:"#e8eef5",muted:"#9fb3c8",grid:"#1f4268",brass:"#d9a441",line:"#7fc4e8",zeta:"#a7e3a1",hot:"#f08a4b"};
+const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
+// complex arithmetic
+const cx=(re,im)=>({re,im});
+const sub=(a,b)=>cx(a.re-b.re,a.im-b.im);
+const div=(a,b)=>{const q=b.re*b.re+b.im*b.im;return cx((a.re*b.re+a.im*b.im)/q,(a.im*b.re-a.re*b.im)/q);};
+const abs=a=>Math.hypot(a.re,a.im);
+const ONE=cx(1,0), HALF=cx(0.5,0);
+const wOf=r=>sub(ONE,div(ONE,r));                 // w = 1 − 1/ρ
+const landOf=r=>sub(ONE,div(ONE,sub(r,HALF)));    // Cayley image on the tangent line Re w = 1: 1 − 1/(ρ − ½)
+
+let nZ=30, which=0, beta=0.5, zoomV=40, lean=0, nPow=2500;
+ZEROS.slice(0,10).forEach((z,i)=>{const o=document.createElement("option");o.value=i;o.textContent="γ"+(i+1)+" = "+z.toFixed(2);$("which").appendChild(o);});
+
+function points(){
+  const P=[];
+  for(let k=0;k<nZ;k++){
+    const g=ZEROS[k], moved=(k===which&&beta>0.5);
+    const rhos=moved?[cx(beta,g),cx(1-beta,g)]:[cx(0.5,g)];
+    for(const r of rhos) for(const s of [1,-1]){
+      const rr=cx(r.re,s*r.im); P.push({k,rho:rr,w:wOf(rr),L:landOf(rr),hot:moved});
+    }
+  }
+  return P;
+}
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
+function grid(g,w,h,s){g.strokeStyle=C.grid;g.lineWidth=1;g.beginPath();for(let x=0;x<w;x+=s){g.moveTo(x,0);g.lineTo(x,h);}for(let y=0;y<h;y+=s){g.moveTo(0,y);g.lineTo(w,y);}g.stroke();}
+function dot(g,x,y,r,col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,2*Math.PI);g.fill();}
+
+function drawA(P){
+  const {g,w:W,h:H,d}=fit($("cvA")); grid(g,W,H,18*d);
+  const Z=Math.pow(10,zoomV/40);                     // 1 … 316
+  const vx=1-0.5/Z, half=1.25/Z, s=(H/2)/half;
+  const X=x=>W/2+(x-vx)*s, Y=y=>H/2-y*s;
+  g.strokeStyle="rgba(159,179,200,0.5)"; g.lineWidth=1*d; g.beginPath(); g.moveTo(0,Y(0)); g.lineTo(W,Y(0)); g.stroke();
+  g.strokeStyle=C.zeta; g.lineWidth=1.6*d; g.beginPath(); g.arc(X(0),Y(0),s,0,2*Math.PI); g.stroke();      // unit circle
+  g.strokeStyle=C.line; g.lineWidth=1.6*d; g.beginPath(); g.moveTo(X(1),0); g.lineTo(X(1),H); g.stroke();  // tangent line
+  // rays from −1 (only for points on the circle; the Cayley map equals this projection there)
+  g.strokeStyle="rgba(217,164,65,0.22)"; g.lineWidth=1*d; g.beginPath();
+  for(const p of P){ if(p.hot) continue; g.moveTo(X(-1),Y(0)); g.lineTo(X(1),Y(p.L.im)); } g.stroke();
+  for(const p of P){
+    if(p.hot) continue;
+    dot(g,X(p.w.re),Y(p.w.im),2.6*d,C.zeta); dot(g,X(1),Y(p.L.im),2.6*d,C.brass);
+  }
+  for(const p of P){ if(!p.hot) continue;
+    g.setLineDash([4*d,3*d]); g.strokeStyle=C.hot; g.lineWidth=1*d; g.beginPath(); g.moveTo(X(p.w.re),Y(p.w.im)); g.lineTo(X(p.L.re),Y(p.L.im)); g.stroke(); g.setLineDash([]);
+    dot(g,X(p.w.re),Y(p.w.im),3.4*d,C.hot); dot(g,X(p.L.re),Y(p.L.im),3.4*d,C.hot);
+  }
+  if(X(-1)>0) { dot(g,X(-1),Y(0),3.5*d,C.ink); g.fillStyle=C.muted; g.font=(11*d)+"px "+MONO; g.fillText("−1",X(-1)-22*d,Y(0)-6*d); }
+  g.fillStyle=C.muted; g.font=(11*d)+"px "+MONO; g.fillText((W/d<520)?"tangent at 1":"tangent line at w = 1",X(1)+6*d,14*d);
+  // labels for the first landings when they are far enough apart
+  g.fillStyle=C.brass; g.font=((W/d<520)?10:11)*d+"px "+MONO; let lastY=-1e9;
+  for(let k=0;k<Math.min(nZ,6);k++){ if(k===which&&beta>0.5) continue; const y=Y(1/ZEROS[k]); if(y<12*d||y>H-6*d) continue; if(Math.abs(y-lastY)<14*d) break;
+    g.fillText("1/γ"+(k+1)+" = "+(1/ZEROS[k]).toFixed(4),X(1)+8*d,y+4*d); lastY=y; }
+  $("zoomv").textContent="×"+Z.toFixed(Z<10?1:0);
+  const k=which, g0=ZEROS[k];
+  if(beta>0.5){
+    const a=wOf(cx(beta,g0)), b=wOf(cx(1-beta,g0)), La=landOf(cx(beta,g0));
+    $("readA").textContent="Zero "+(k+1)+" moved to β = "+beta.toFixed(3)+": its point sits at |w| = "+abs(a).toFixed(6)+" (inside), its mirror partner at |w| = "+abs(b).toFixed(6)+" (outside).\nOn the tangent line it lands "+Math.abs(La.re-1).toExponential(2)+" beside the line, at height "+La.im.toFixed(5)+".";
+  } else {
+    const a=wOf(cx(0.5,g0));
+    $("readA").textContent="Zero "+(k+1)+": w = "+a.re.toFixed(5)+" + "+a.im.toFixed(5)+"i,  |w| = "+abs(a).toFixed(9)+",  angle "+(Math.atan2(a.im,a.re)*180/Math.PI).toFixed(3)+"°\nLands on the tangent line at height "+(1/g0).toFixed(6)+" = 1/γ"+(k+1)+".";
+  }
+}
+
+function drawB(P){
+  const {g,w:W,h:H,d}=fit($("cvB")); grid(g,W,H,18*d);
+  const ph=lean*Math.PI/180, cs=Math.cos(ph), sn=Math.sin(ph);
+  const R=P.map(p=>({v:p.L.im*cs+(p.L.re-1)*sn,hot:p.hot,inside:p.rho.re>0.5,up:p.rho.im>0}));
+  const m=Math.max(...R.map(r=>Math.abs(r.v)));
+  const y0=H*0.58, x0=W/2, span=W*0.45;
+  g.strokeStyle=C.muted; g.lineWidth=1*d; g.beginPath(); g.moveTo(W*0.04,y0); g.lineTo(W*0.96,y0); g.stroke();
+  dot(g,x0,y0,4*d,C.ink);
+  g.fillStyle=C.muted; g.font=(11*d)+"px "+MONO; g.textAlign="center"; g.fillText("touching point",x0,y0+20*d);
+  if(m<1e-13){
+    g.fillStyle=C.zeta; g.font=(13*d)+"px "+MONO; g.fillText("edge-on: every zero collapses into the touching point",x0,H*0.25);
+  } else {
+    const sc=span/m;
+    for(const r of R){ g.strokeStyle=r.hot?C.hot:C.brass; g.lineWidth=(r.hot?2.4:1.4)*d; const x=x0+r.v*sc; g.beginPath(); g.moveTo(x,y0-(r.hot?18:12)*d); g.lineTo(x,y0+(r.hot?4:0)*d); g.stroke(); }
+    g.fillStyle=C.muted; g.fillText("+"+m.toExponential(2),x0+span,y0+20*d); g.fillText("−"+m.toExponential(2),x0-span,y0+20*d);
+  }
+  g.textAlign="left";
+  $("leanv").textContent=lean.toFixed(1).replace(".0","")+"°";
+  const hot=R.filter(r=>r.hot), cold=R.filter(r=>!r.hot);
+  const coldMax=cold.length?Math.max(...cold.map(r=>Math.abs(r.v))):0;
+  $("readB").textContent="Reading = height·cos φ + offset·sin φ.  Largest reading of the zeros on the line: "+coldMax.toExponential(2)+
+    (hot.length?"\nMoved zero (upper half): "+hot.filter(r=>r.up).map(r=>(r.inside?"inside ":"outside partner ")+r.v.toExponential(2)).join(",  ")+(lean>=89.99?"   ← the only things sticking out":""):"");
+}
+
+function drawC(){
+  const {g,w:W,h:H,d}=fit($("cvC")); grid(g,W,H,18*d);
+  const g0=ZEROS[which], w0=wOf(cx(0.5,g0)), th=Math.atan2(w0.im,w0.re);
+  const off=beta>0.5, wo=wOf(cx(1-beta,g0)), ro=abs(wo), tho=Math.atan2(wo.im,wo.re);
+  const Rmax=off?Math.max(1.05,Math.pow(ro,nPow)):1.05;
+  const cxp=W/2, cyp=H/2, s=Math.min(W,H)*0.44/Rmax;
+  g.strokeStyle="rgba(159,179,200,0.45)"; g.lineWidth=1*d; g.beginPath(); g.moveTo(0,cyp); g.lineTo(W,cyp); g.moveTo(cxp,0); g.lineTo(cxp,H); g.stroke();
+  g.strokeStyle=C.zeta; g.lineWidth=1.6*d; g.beginPath(); g.arc(cxp,cyp,s,0,2*Math.PI); g.stroke();
+  const step=Math.max(1,Math.floor(nPow/1500));
+  for(let n=0;n<=nPow;n+=step){ dot(g,cxp+s*Math.cos(n*th),cyp-s*Math.sin(n*th),1.6*d,C.brass); }
+  if(off){
+    g.strokeStyle=C.hot; g.lineWidth=1.4*d; g.beginPath();
+    const st=Math.max(1,Math.floor(nPow/4000));
+    for(let n=0;n<=nPow;n+=st){ const r=Math.pow(ro,n)*s, x=cxp+r*Math.cos(n*tho), y=cyp-r*Math.sin(n*tho); n?g.lineTo(x,y):g.moveTo(x,y); }
+    g.stroke();
+    const rN=Math.pow(ro,nPow); dot(g,cxp+rN*s*Math.cos(nPow*tho),cyp-rN*s*Math.sin(nPow*tho),3.5*d,C.hot);
+  }
+  $("nPowv").textContent=nPow;
+  const deg=th*180/Math.PI;
+  if(off){
+    const need=g0*g0/(beta-0.5);
+    $("readC").textContent="On the line: |wⁿ| = 1, turning "+deg.toFixed(3)+"° per step.\nOff the line (β = "+beta.toFixed(3)+", mirror partner outside): |w| = "+ro.toFixed(7)+", so |wⁿ| = "+Math.pow(ro,nPow).toPrecision(4)+" at n = "+nPow+".\nGrows by a factor e after about n ≈ γ²/(β − ½) = "+need.toFixed(0)+".";
+  } else {
+    $("readC").textContent="Zero "+(which+1)+" on the line: |w| = 1 exactly, so wⁿ only turns, "+deg.toFixed(3)+"° per step ("+(360/deg).toFixed(1)+" steps per turn).\nMove β to push its mirror partner outside the circle and watch the powers spiral.";
+  }
+}
+
+function draw(){ const P=points(); drawA(P); drawB(P); drawC(); }
+$("nZ").addEventListener("input",function(){nZ=+this.value;$("nZv").textContent=nZ;draw();});
+$("which").addEventListener("change",function(){which=+this.value;draw();});
+$("beta").addEventListener("input",function(){beta=+this.value;$("betav").textContent=beta.toFixed(3);draw();});
+$("zoom").addEventListener("input",function(){zoomV=+this.value;draw();});
+$("lean").addEventListener("input",function(){lean=+this.value;draw();});
+$("nPow").addEventListener("input",function(){nPow=+this.value;draw();});
+window.addEventListener("resize",draw);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
+draw();
+})();
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@ Writes scripts/explainer_data.json (the data embedded in index.html).
 Needs numpy and scipy. Sieves all primes up to 10^8 (about 100 MB of memory, a few minutes).
 
 What it computes
-  1. Zeros of the Riemann zeta function up to height 300 (Riemann-Siegel formula + bisection).
+  1. Zeros of the Riemann zeta function up to height 300 (Riemann-Siegel to bracket, Euler-Maclaurin to refine).
   2. The circle chain: circles of radius p (every prime p >= 3) standing on a line, each
      touching the next, so consecutive centres are 2*sqrt(p*q) apart horizontally.
   3. The wobble: centre position minus the smooth curve 2*li(y^2) - y - 3, scaled by y^1.5/ln y.
@@ -18,23 +18,34 @@ from scipy.special import expi
 HERE = os.path.dirname(os.path.abspath(__file__))
 li = lambda v: expi(np.log(v))
 
-# 1. zeta zeros via the Riemann-Siegel Z function
-def theta(t): return t/2*np.log(t/(2*np.pi)) - t/2 - np.pi/8 + 1/(48*t) + 7/(5760*t**3)
-def Z(t):
+# 1. zeta zeros: Riemann-Siegel Z to bracket the sign changes, then each zero refined with an
+#    accurate Hardy Z function (zeta by Euler-Maclaurin summation, theta from log-gamma).
+#    The leading-term Riemann-Siegel formula alone is off by up to ~0.008 at these heights.
+from math import factorial
+from scipy.special import loggamma
+from scipy.optimize import brentq
+def theta_rs(t): return t/2*np.log(t/(2*np.pi)) - t/2 - np.pi/8 + 1/(48*t) + 7/(5760*t**3)
+def Z_rs(t):
     N = int(np.sqrt(t/(2*np.pi))); n = np.arange(1, N+1)
-    s = 2*np.sum(np.cos(theta(t) - t*np.log(n))/np.sqrt(n))
+    s = 2*np.sum(np.cos(theta_rs(t) - t*np.log(n))/np.sqrt(n))
     a = np.sqrt(t/(2*np.pi)); p = a - N
     C0 = np.cos(2*np.pi*(p*p - p - 1/16))/np.cos(2*np.pi*p)
     return s + (-1)**(N-1)*a**-0.5*C0
-ts = np.arange(10, 300, 0.005); v = np.array([Z(t) for t in ts]); zeros = []
+BERN = [1/6, -1/30, 1/42, -1/30, 5/66, -691/2730, 7/6, -3617/510, 43867/798, -174611/330, 854513/138, -236364091/2730]
+def zeta_em(s, N=120, m=12):
+    n = np.arange(1, N); z = np.sum(n**(-s)) + N**(1-s)/(s-1) + 0.5*N**(-s)
+    p = s; term = N**(-s-1)
+    for k in range(1, m+1):
+        z += BERN[k-1]/factorial(2*k)*p*term
+        p *= (s+2*k-1)*(s+2*k); term *= N**(-2)
+    return z
+def Z(t): return (np.exp(1j*(loggamma(0.25+0.5j*t).imag - t/2*np.log(np.pi)))*zeta_em(0.5+1j*t)).real
+ts = np.arange(10, 300, 0.005); v = np.array([Z_rs(t) for t in ts]); zeros = []
 for i in np.where(np.sign(v[:-1]) != np.sign(v[1:]))[0]:
-    a, b = ts[i], ts[i+1]
-    for _ in range(40):
-        m = (a+b)/2
-        if np.sign(Z(m)) == np.sign(Z(a)): a = m
-        else: b = m
-    zeros.append((a+b)/2)
-print(len(zeros), "zeros up to 300; first:", np.round(zeros[:5], 6))
+    g0 = (ts[i]+ts[i+1])/2; grid = np.linspace(g0-0.05, g0+0.05, 41); zv = [Z(t) for t in grid]
+    k = [j for j in range(40) if np.sign(zv[j]) != np.sign(zv[j+1])][0]
+    zeros.append(brentq(Z, grid[k], grid[k+1], xtol=1e-12))
+print(len(zeros), "zeros up to 300; first:", np.round(zeros[:5], 6))   # 14.134725, 21.02204, 25.010858, ...
 
 # 2-3. circle chain and wobble
 def sieve(X):
