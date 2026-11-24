@@ -37,6 +37,12 @@ Turning circles side by side. Left: a Fourier series of a square wave, whose spe
 
 Every zero ρ is sent to w = 1 − 1/ρ, which maps the critical line onto the unit circle: RH says every zero is exactly as far from 0 as from 1. Projected from −1 onto the tangent line at w = 1, each zero lands at height exactly 1/γ. A lean slider tilts the tangent line until every zero on the critical line collapses into the touching point, and a third panel shows Li's criterion (λₙ ≥ 0 for all n): powers wⁿ only turn on the circle but spiral out for a zero off the line, after about n ≈ γ²/(β − ½) steps.
 
+## Every Number as Rectangles
+
+👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/factors.html**
+
+Every whole number drawn as all of its rectangles a×b at once, centred, equal in area: a little star whose outline is the staircase under the hyperbola xy = n. Primes have only 1×p, so their stars are bare crosses; numbers with many factorisations fill out the hyperbolic shape. The stars sit on a golden-angle (Vogel) or square (Ulam) spiral, so the pattern never repeats. Tap a star to see its rectangles at true scale with the corners on xy = n. The page ends with the Dirichlet divisor problem, the counting wobble of all these rectangles and a sister problem of RH.
+
 ## Mathematical background
 
 The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to

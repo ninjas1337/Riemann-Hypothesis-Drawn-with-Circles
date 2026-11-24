@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every Number as Rectangles</title>
+<meta name="description" content="Every whole number drawn as all of its rectangles at once. Primes are lonely thin crosses, rich numbers fill out a hyperbolic star, and a golden-angle spiral keeps the pattern from ever repeating.">
+<meta property="og:title" content="Every Number as Rectangles">
+<meta property="og:description" content="All factorisations of every number, drawn as rectangles. Primes stand out as lonely crosses.">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Blueprint theme shared with the companion pages. One reading column; a large pattern sheet with its controls, then a detail sheet for the chosen number. */
+  --bp:#0f2a47; --deep:#0b2039; --ink:#e8eef5; --muted:#9fb3c8; --grid:#1f4268;
+  --brass:#d9a441; --line:#7fc4e8; --zeta:#a7e3a1; --hot:#f08a4b;
+  --font-display:"Source Serif 4", Georgia, serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--deep);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:26px}
+.back{font-size:.9rem;color:var(--line)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:4px 0 8px;text-wrap:balance}
+h1 em{color:var(--hot);font-weight:400}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0;text-wrap:balance}
+p{margin:0;max-width:70ch}
+.lede{color:var(--muted);font-size:1.06rem}
+section{display:grid;gap:12px}
+.sheet{background:var(--bp);border:1px solid var(--grid);border-radius:10px;padding:12px;display:grid;gap:10px}
+canvas{display:block;width:100%;border-radius:6px;background:var(--bp);touch-action:manipulation;cursor:crosshair}
+#cvP{aspect-ratio:1/1} #cvD{aspect-ratio:1.6/1;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.9rem}
+.row label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--brass);width:min(170px,100%)}
+input[type=number]{font:inherit;font-size:.9rem;width:6.5em;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:3px 6px}
+button{font:inherit;font-size:.86rem;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button.on{background:var(--brass);border-color:var(--brass);color:var(--deep);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.read{font-family:var(--font-mono);font-size:.84rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:pre-wrap}
+.key{display:inline-block;width:.85em;height:.85em;border-radius:2px;vertical-align:-.08em;margin-right:4px}
+.formula{font-family:var(--font-mono);font-size:.95rem;background:var(--bp);border:1px solid var(--grid);border-radius:8px;padding:10px 14px;overflow-x:auto;max-width:70ch}
+.callout{border-left:4px solid var(--hot);background:var(--bp);padding:12px 16px;border-radius:0 8px 8px 0;max-width:70ch}
+footer{border-top:1px solid var(--grid);padding-top:16px;font-size:.85rem;color:var(--muted);display:grid;gap:8px}
+footer ol{margin:0;padding-left:20px;display:grid;gap:4px}
+a{color:var(--line)}
+</style>
+</head>
+<body>
+<main>
+<div>
+  <a class="back" href="index.html">← The Riemann Hypothesis, drawn with circles</a>
+  <h1>Every number as rectangles, <em>primes as lonely crosses</em></h1>
+  <p class="lede">Twelve unit squares can be laid out as a 1×12 strip, a 2×6 rectangle or a 3×4 rectangle. Draw all of a number's rectangles on top of each other, centred, and every number becomes a little star. A prime has only one rectangle, the thin strip 1×p, so its star is a bare cross. Set the stars out on a golden-angle spiral and the pattern, like a Penrose tiling, never repeats.</p>
+</div>
+
+<section>
+  <div class="sheet">
+    <canvas id="cvP" role="img" aria-label="Every number up to N drawn as the star of all its rectangles, arranged on a spiral; tap a star to inspect it"></canvas>
+    <div class="row">
+      <label for="N">Numbers 1 to <input id="N" type="range" min="30" max="1500" value="300"> <b class="num" id="Nv">300</b></label>
+      <button id="lGold" class="on" type="button">Golden spiral</button>
+      <button id="lUlam" type="button">Square spiral</button>
+      <label for="pick">Show <input id="pick" type="number" min="1" max="100000" value="12"></label>
+    </div>
+    <p class="read"><span class="key" style="background:var(--hot)"></span>prime (one rectangle)  <span class="key" style="background:var(--brass)"></span>few rectangles  <span class="key" style="background:var(--zeta)"></span>many rectangles  <span class="key" style="background:var(--ink)"></span>1, the empty product
+Tap a star to see its rectangles below.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The star of one number</h2>
+  <div class="sheet">
+    <canvas id="cvD" role="img" aria-label="All rectangles of the chosen number at true scale, with their corners on the hyperbola xy = n"></canvas>
+    <p class="read" id="readD"></p>
+  </div>
+  <p>Put one corner of every rectangle at the origin. The opposite corners all lie on the hyperbola <b>xy = n</b>, because every rectangle has the same area n. Each corner is one way to factor n. A prime has only the two corners far out on the edges, (1, p) and (p, 1). The outline of a star is this staircase under the hyperbola, mirrored into four quadrants, so the more ways a number can be factored, the more its star fills out the smooth hyperbolic shape.</p>
+  <p>Using all the prime factors as edges gives a box instead of a rectangle, and every number has exactly one such box: 12 is a 2×2×3 box and nothing else. That is the fundamental theorem of arithmetic, as geometry.</p>
+</section>
+
+<section>
+  <h2>Counting all the rectangles</h2>
+  <p>How many rectangles are there with area at most N? Each one is a grid point (a, b) under the hyperbola xy = N, so the count is the number of grid points in that region. Dirichlet showed in 1849 that it follows a smooth curve:</p>
+  <div class="formula">rectangles with area ≤ N  =  N·ln N + (2γ − 1)·N + Δ(N)</div>
+  <p>Here γ ≈ 0.5772 is Euler's constant and Δ(N) is a wobble, exactly like the wobble of the circle chain. How big Δ(N) can get is the Dirichlet divisor problem. It is believed to grow no faster than about N<sup>1/4</sup>, while the best proven bound is about N<sup>0.314</sup>. Voronoi showed that this wobble too is a sum of waves. It is a sister problem of the Riemann Hypothesis, and it is still open.</p>
+  <div class="callout"><p>Primes are the numbers whose stars are almost empty. Their corners sit alone on the edges of the hyperbola, and how those lonely points are spread out is what the Riemann Hypothesis is about.</p></div>
+</section>
+
+<footer>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="tangent.html">The zeros on a circle</a>. Each star draws every rectangle a×b of n centred and scaled so that all of them have the same area, clipped to its cell; positions follow Vogel's golden-angle spiral (137.5° per step) or Ulam's square spiral.</p>
+  <ol>
+    <li>Euclid, <i>Elements</i>, Book VII, definitions 11 and 16–19 (prime, plane, square and solid numbers); Book IX, Prop. 14.</li>
+    <li>P. G. L. Dirichlet, Über die Bestimmung der mittleren Werthe in der Zahlentheorie, <i>Abh. Akad. Wiss. Berlin</i> (1849), 69–83.</li>
+    <li>G. Voronoï, Sur une fonction transcendante et ses applications à la sommation de quelques séries, <i>Ann. Sci. ENS</i> 21 (1904), 207–267, 459–533.</li>
+    <li>G. H. Hardy, On Dirichlet's divisor problem, <i>Proc. London Math. Soc.</i> 15 (1916), 1–25.</li>
+    <li>J. Bourgain &amp; N. Watt, Mean square of zeta function, circle problem and divisor problem revisited, arXiv:1709.04340 (2017).</li>
+    <li>H. Vogel, A better way to construct the sunflower head, <i>Math. Biosci.</i> 44 (1979), 179–189.</li>
+    <li>R. Penrose, The role of aesthetics in pure and applied mathematical research, <i>Bull. Inst. Math. Appl.</i> 10 (1974), 266–271.</li>
+    <li>F. J. Dyson, Birds and frogs, <i>Notices Amer. Math. Soc.</i> 56 (2009), 212–223 (the zeta zeros as a one-dimensional quasicrystal).</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const C={bp:"#0f2a47",ink:"#e8eef5",muted:"#9fb3c8",grid:"#1f4268",brass:"#d9a441",line:"#7fc4e8",zeta:"#a7e3a1",hot:"#f08a4b"};
+const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
+const GA=Math.PI*(3-Math.sqrt(5));          // golden angle, 137.5°
+let N=300, layout="gold", sel=12, pos=[];
+
+function pairs(n){const P=[];for(let a=1;a*a<=n;a++) if(n%a===0) P.push([a,n/a]);return P;}
+function factor(n){const f=[];let m=n;for(let p=2;p*p<=m;p++){while(m%p===0){f.push(p);m/=p;}}if(m>1)f.push(m);return f;}
+function ndiv(n){let c=0;for(let a=1;a*a<=n;a++) if(n%a===0) c+=(a*a===n)?1:2;return c;}
+function colour(n,dn){ if(n===1) return C.ink; if(dn===2) return C.hot;
+  const t=Math.min(1,(dn-3)/13); // 3 … 16 divisors: brass → green
+  const a=[217,164,65], b=[167,227,161]; return "rgb("+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(",")+")"; }
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
+
+function ulam(n){ // position of n on Ulam's square spiral (1 at the centre)
+  if(n===1) return [0,0];
+  const k=Math.ceil((Math.sqrt(n)-1)/2), t=2*k+1, m=t*t, s=t-1;
+  if(n>=m-s) return [k-(m-n),-k]; let mm=m-s;
+  if(n>=mm-s) return [-k,-k+(mm-n)]; mm-=s;
+  if(n>=mm-s) return [-k+(mm-n),k]; return [k,k-(mm-n-s)];
+}
+
+function drawP(){
+  const {g,w:W,h:H,d}=fit($("cvP"));
+  const cx=W/2, cy=H/2, R=Math.min(W,H)*0.47; pos=[];
+  let B;
+  if(layout==="gold"){ const c=R/Math.sqrt(N); B=0.78*c;
+    for(let n=1;n<=N;n++){const r=c*Math.sqrt(n-0.5), th=n*GA; pos.push([n,cx+r*Math.cos(th),cy+r*Math.sin(th)]);}
+  } else { const k=Math.ceil((Math.sqrt(N)-1)/2), cell=2*R/(2*k+1); B=0.47*cell;
+    for(let n=1;n<=N;n++){const [x,y]=ulam(n); pos.push([n,cx+x*cell,cy-y*cell]);}
+  }
+  const s0=0.62*B;                                    // every rectangle of n has area (s0)² before clipping
+  for(const [n,x,y] of pos){
+    const P=pairs(n), dn=ndiv(n), col=colour(n,dn), k=s0/Math.sqrt(n);
+    g.save(); g.beginPath(); g.rect(x-B,y-B,2*B,2*B); g.clip();
+    g.fillStyle=col; g.globalAlpha=(dn===2?0.9:0.32);
+    for(const [a,b] of P){
+      const wa=Math.max(a*k,(dn===2?1.4:0.8)*d), hb=b*k;
+      g.fillRect(x-hb/2,y-wa/2,hb,wa); if(a!==b) g.fillRect(x-wa/2,y-hb/2,wa,hb);
+    }
+    g.globalAlpha=1; g.strokeStyle=col; g.lineWidth=0.8*d;
+    for(const [a,b] of P){ const wa=a*k, hb=b*k; if(a===b){g.strokeRect(x-wa/2,y-wa/2,wa,wa);} else if(wa>2*d){g.strokeRect(x-hb/2,y-wa/2,hb,wa);g.strokeRect(x-wa/2,y-hb/2,wa,hb);} }
+    g.restore();
+    if(n===sel){ g.strokeStyle=C.ink; g.lineWidth=1.6*d; g.beginPath(); g.arc(x,y,B*1.15,0,2*Math.PI); g.stroke(); }
+  }
+  $("Nv").textContent=N;
+}
+
+function drawD(){
+  const {g,w:W,h:H,d}=fit($("cvD"));
+  const n=sel, P=pairs(n), f=factor(n), dn=ndiv(n);
+  const pad=34*d, side=Math.min(W,H)-2*pad;
+  // log-friendly view: show up to max(b) but cap so small rectangles stay visible
+  const M=Math.min(n,Math.max(12,Math.ceil(Math.sqrt(n)*4)));   // visible extent in units
+  const s=side/M, ox=pad+ (W-2*pad-side)/2, oy=H-pad;
+  const X=x=>ox+x*s, Y=y=>oy-y*s;
+  // grid of unit squares when it is fine enough
+  if(s>=5*d){ g.strokeStyle="rgba(31,66,104,0.9)"; g.lineWidth=1; g.beginPath(); for(let i=0;i<=M;i++){g.moveTo(X(i),Y(0));g.lineTo(X(i),Y(M));g.moveTo(X(0),Y(i));g.lineTo(X(M),Y(i));} g.stroke(); }
+  g.strokeStyle=C.muted; g.lineWidth=1.2*d; g.beginPath(); g.moveTo(X(0),Y(0)); g.lineTo(X(M),Y(0)); g.moveTo(X(0),Y(0)); g.lineTo(X(0),Y(M)); g.stroke();
+  // hyperbola xy = n
+  g.setLineDash([5*d,4*d]); g.strokeStyle=C.line; g.lineWidth=1.3*d; g.beginPath(); let first=true;
+  for(let i=0;i<=400;i++){ const x=n/M+(M-n/M)*i/400, y=n/x; if(y>M) continue; first?g.moveTo(X(x),Y(y)):g.lineTo(X(x),Y(y)); first=false; } g.stroke(); g.setLineDash([]);
+  const col=colour(n,dn);
+  const corners=[]; for(const [a,b] of P){ corners.push([a,b]); if(a!==b) corners.push([b,a]); }
+  for(const [a,b] of corners){ g.fillStyle=col; g.globalAlpha=0.16; g.fillRect(X(0),Y(Math.min(b,M)),Math.min(a,M)*s,Math.min(b,M)*s); g.globalAlpha=1;
+    g.strokeStyle=col; g.lineWidth=1.4*d; g.strokeRect(X(0),Y(Math.min(b,M)),Math.min(a,M)*s,Math.min(b,M)*s); }
+  g.font=(11*d)+"px "+MONO;
+  for(const [a,b] of corners){ if(a>M||b>M) continue; g.fillStyle=col; g.beginPath(); g.arc(X(a),Y(b),3.6*d,0,2*Math.PI); g.fill();
+    if(corners.length<=12){ g.fillStyle=C.ink; g.fillText(a+"×"+b,X(a)+6*d,Y(b)-5*d); } }
+  g.fillStyle=C.line; g.fillText("xy = "+n,X(M)-70*d,Y(n/M)-8*d>14*d?Y(n/M)-8*d:14*d);
+  if(M<n){ g.fillStyle=C.muted; g.fillText("(1×"+n+" runs off to "+n+")",X(0)+6*d,14*d); }
+  const box=f.length>1?(f.join("×")+" box"):"";
+  const list=P.map(([a,b])=>a+"×"+b).join(", ");
+  $("readD").textContent=(n===1?"1 is the empty product: one 1×1 square.":
+    (dn===2?n+" is prime: only 1×"+n+" and "+n+"×1, a lonely strip.":
+    n+" = "+f.join(" · ")+":  "+dn+" rectangles ("+list+(P.some(([a,b])=>a!==b)?", and each turned":"")+").\nAs a box with prime edges: one "+box+", and no other.")) ;
+  $("pick").value=n;
+}
+
+function draw(){ drawP(); drawD(); }
+$("N").addEventListener("input",function(){N=+this.value; drawP();});
+$("lGold").addEventListener("click",function(){layout="gold";this.classList.add("on");$("lUlam").classList.remove("on");drawP();});
+$("lUlam").addEventListener("click",function(){layout="ulam";this.classList.add("on");$("lGold").classList.remove("on");drawP();});
+$("pick").addEventListener("change",function(){const v=Math.max(1,Math.min(100000,Math.round(+this.value||1)));sel=v;draw();});
+$("cvP").addEventListener("click",function(e){
+  const r=this.getBoundingClientRect(), d=window.devicePixelRatio||1, x=(e.clientX-r.left)*d, y=(e.clientY-r.top)*d;
+  let best=null,bd=1e18; for(const [n,px,py] of pos){const q=(px-x)**2+(py-y)**2; if(q<bd){bd=q;best=n;}}
+  if(best){sel=best; draw();}
+});
+window.addEventListener("resize",draw);
+if(window.innerWidth<520){N=200;$("N").value=200;}
+draw();
+})();
+</script>
+</body>
+</html>
