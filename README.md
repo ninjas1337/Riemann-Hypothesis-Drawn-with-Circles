@@ -25,6 +25,12 @@ Draw a circle of radius 3 standing on a line. Next to it, a circle of radius 5, 
 
 A virtual mechanical machine: Lehmer-style sieve gears feed a ratchet that moves a prime shaft by 2√(pq) per prime; a cam cut to 2·li(y²) − y − 3 drives a smooth shaft; a controller of zeta-zero oscillators (wheels turning at γ in log-time, size 4/|ρ+1|) feeds a differential that shows the remaining slip. A chart recorder traces the slip, and a pole diagram lets you drag the first zero off the critical line: the slip then grows an oscillation the real primes do not have. In control language, the prime-power impulses in log-time have the transfer function −ζ′(s)/ζ(s), whose poles are the zeta zeros; RH says they all sit on the stability boundary.
 
+## Two Clockworks: Fourier and Zeta
+
+👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/epicycles.html**
+
+Turning circles side by side. Left: a Fourier series of a square wave, whose speeds 1, 3, 5, … repeat; a wobble slider makes each circle pulse in size. Right: one circle per zeta zero, speed γ, fixed angle arctan(γ/1.5), never repeating; a β slider moves one zero off the critical line so its circle breathes like y^(β−½). The point: a periodically wobbling circle is just three steady circles (sidebands, r(1 + w sin Ωt)·sin mt = r sin mt + (rw/2)[cos((m−Ω)t) − cos((m+Ω)t)]), while a steadily growing circle has a complex speed, which is exactly what a zero with β ≠ ½ would be. RH: the music may wobble, but no circle breathes.
+
 ## Mathematical background
 
 The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to
@@ -41,6 +47,7 @@ The spectrum on the page is computed from the scaled wobble E/(y^1.5/ln y), resa
 python3 scripts/compute_data.py   # zeros, circle chain up to 10^8, spectra (numpy, scipy)
 python3 scripts/build_page.py     # embeds the data into index.html
 python3 scripts/build_machine.py  # embeds the zeros into machine.html
+python3 scripts/build_epicycles.py  # embeds the zeros into epicycles.html
 ```
 
 ## Credits
