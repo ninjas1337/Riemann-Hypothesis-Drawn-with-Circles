@@ -43,11 +43,11 @@ Every zero ρ is sent to w = 1 − 1/ρ, which maps the critical line onto the u
 
 Every whole number drawn as all of its rectangles a×b at once, centred, equal in area: a little star whose outline is the staircase under the hyperbola xy = n. Primes have only 1×p, so their stars are bare crosses; numbers with many factorisations fill out the hyperbolic shape. The stars sit on a golden-angle (Vogel) or square (Ulam) spiral, so the pattern never repeats. Tap a star to see its rectangles at true scale with the corners on xy = n. The page ends with the Dirichlet divisor problem, the counting wobble of all these rectangles and a sister problem of RH.
 
-## Growing a Tiling from Prime Rectangles
+## Growing a Tiling from the Numbers
 
 👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/tiles.html**
 
-Every rectangle with two prime sides (2×2, 2×3, 3×3, 2×5, 2×7, 3×5, …), one of each, in order of area, placed greedily where its farthest corner stays closest to the start. A density trace shows how much of the enclosing disc is covered. Every tile is at least 2 wide, so 1-wide cracks stay open forever; switching to every factorisation adds the primes' 1×p strips, which act as mortar and fill them.
+The numbers in order as tiles: each prime a thin 1×p strip, every other number all of its rectangles with sides of at least 2 (4 → 2×2, 6 → 2×3, 8 → 2×4, 9 → 3×3, 12 → 2×6 and 3×4, …), placed greedily where the farthest corner stays closest to the start, with a disc-coverage trace. Composite tiles are at least 2 wide, so only the primes' strips can seal 1-wide cracks: the primes are the mortar. A second mode uses only prime×prime rectangles for comparison.
 
 ## Mathematical background
 

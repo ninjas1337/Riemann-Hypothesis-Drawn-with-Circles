@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Growing a Tiling from Prime Rectangles</title>
-<meta name="description" content="Start with a 2×2 square, then 2×3, 3×3, 2×5: every rectangle with prime sides, in order of area, packed as tightly as possible. Watch the gaps, and see what the primes' thin strips do to them.">
-<meta property="og:title" content="Growing a Tiling from Prime Rectangles">
-<meta property="og:description" content="Every prime×prime rectangle, packed in order of size. Can they close every gap?">
+<title>Growing a Tiling from the Numbers</title>
+<meta name="description" content="Every number in order as tiles: each prime a thin 1×p strip, every other number all of its rectangles 2×2, 2×3, 2×4, 3×3, … packed as tightly as possible.">
+<meta property="og:title" content="Growing a Tiling from the Numbers">
+<meta property="og:description" content="Primes as thin 1×p strips, every other number as its rectangles, packed in order. The primes become the mortar.">
 <meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
 <meta name="author" content="Sanjin Redzic">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,8 +55,8 @@ a{color:var(--line)}
 <main>
 <div>
   <a class="back" href="factors.html">← Every number as rectangles</a>
-  <h1>Growing a tiling from <em>prime rectangles</em></h1>
-  <p class="lede">Start with a 2×2 square. Then 2×3, 3×3, 2×5, 2×7, 3×5, … every rectangle whose two sides are both prime, in order of area, each one used once. Every new tile goes where it keeps the cluster as tight and round as possible. Watch which gaps close and which stay open forever.</p>
+  <h1>Growing a tiling from <em>the numbers</em></h1>
+  <p class="lede">Go through the numbers in order and turn each into tiles. A prime can only be a thin strip, 1×p. Every other number brings all of its rectangles with sides of at least 2: 4 gives 2×2, 6 gives 2×3, 8 gives 2×4, 9 gives 3×3, 12 gives both 2×6 and 3×4. Every new tile goes where it keeps the cluster as tight and round as possible. Watch which gaps close, and what the primes do.</p>
 </div>
 
 <section>
@@ -69,9 +69,9 @@ a{color:var(--line)}
       <label for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"></label>
     </div>
     <div class="row">
-      <button id="mPrime" class="on" type="button">Prime × prime</button>
-      <button id="mAll" type="button">Every factorisation</button>
-      <label for="maxT">Stop after <input id="maxT" type="range" min="20" max="400" value="220"> <b class="num" id="maxTv">220</b> tiles</label>
+      <button id="mAll" class="on" type="button">Primes as 1×p</button>
+      <button id="mPrime" type="button">Prime × prime only</button>
+      <label for="maxT">Stop after <input id="maxT" type="range" min="20" max="400" value="100"> <b class="num" id="maxTv">100</b> tiles</label>
     </div>
     <p class="read">Colour = the short side:  <span class="key" style="background:var(--hot)"></span>1 (a prime's strip)  <span class="key" style="background:#e3b15c"></span>2  <span class="key" style="background:var(--zeta)"></span>3  <span class="key" style="background:var(--line)"></span>4 or 5  <span class="key" style="background:#b9a3e3"></span>6 and up
 Dark background showing through = a gap.</p>
@@ -90,10 +90,10 @@ Dark background showing through = a gap.</p>
 </section>
 
 <section>
-  <h2>Why some gaps never close</h2>
-  <p>Every prime×prime tile is at least 2 wide. A crack only 1 unit wide can never be filled by any later tile, however long you wait. In the prime×prime tiling, those cracks are permanent.</p>
-  <p>Switch to <b>every factorisation</b> and the tile set includes every rectangle a×b, each used once, ordered by area. Now the primes arrive as thin 1×p strips, and they are exactly the tiles that can slip into the 1-wide cracks.</p>
-  <div class="callout"><p>In the full set of factorisations the primes play the role of mortar. They are the only numbers whose single rectangle is one unit wide, and they keep arriving forever.</p></div>
+  <h2>The primes are the mortar</h2>
+  <p>Every composite tile is at least 2 wide. A crack only 1 unit wide can only ever be filled by a prime's 1×p strip, because the primes are the only numbers whose one and only rectangle is a single unit wide. They keep arriving forever, ever longer, at irregular moments: the same irregularity that the Riemann Hypothesis is about.</p>
+  <p>Switch to <b>prime × prime only</b> to see the opposite: only rectangles with two prime sides (2×2, 2×3, 3×3, 2×5, …). Every tile is then at least 2 wide, the 1-wide cracks stay open forever, and the cluster covers noticeably less of its disc.</p>
+  <div class="callout"><p>Composites build the walls; the primes are the thin strips that seal them.</p></div>
   <p>Whether the prime×prime rectangles, one of each, could tile the whole plane with a cleverer rule than this greedy one, I do not know of a result. For squares the question is settled: one square of every whole-number side tiles the plane (Henle and Henle, 2008), but squares with prime sides cannot (Henle and Henle, 2015).</p>
 </section>
 
@@ -121,12 +121,12 @@ function tileList(mode,count){ // rectangles a×b (a ≤ b) ordered by area, the
   for(let n=2;L.length<count;n++){
     for(let a=1;a*a<=n;a++){ if(n%a) continue; const b=n/a;
       if(mode==="prime"){ if(isPrime(a)&&isPrime(b)) L.push([a,b]); }
-      else { if(!(a===1&&b===1)) L.push([a,b]); }
+      else { if(a===1){ if(isPrime(b)) L.push([1,b]); } else L.push([a,b]); }   // primes as 1×p, composites as all rectangles with sides ≥ 2
       if(L.length>=count) break; }
   }
   return L;
 }
-let mode="prime", maxT=220, tiles=[], order=[], idx=0, running=!reduce, dens=[], acc=0, done=false;
+let mode="num", maxT=100, tiles=[], order=[], idx=0, running=!reduce, dens=[], acc=0, done=false;
 function reset(){ order=tileList(mode,maxT); tiles=[]; idx=0; dens=[]; done=false;
   const [a,b]=order[0]; tiles.push({x:-b/2,y:-a/2,w:b,h:a,a,b}); idx=1; dens.push(density()); draw(); }
 
@@ -192,7 +192,7 @@ $("run").addEventListener("click",function(){ if(done){reset();} running=!runnin
 $("stepB").addEventListener("click",()=>{ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); if(place()) draw(); else draw(); });
 $("reset").addEventListener("click",reset);
 $("mPrime").addEventListener("click",function(){ mode="prime"; this.classList.add("on"); $("mAll").classList.remove("on"); reset(); });
-$("mAll").addEventListener("click",function(){ mode="all"; this.classList.add("on"); $("mPrime").classList.remove("on"); reset(); });
+$("mAll").addEventListener("click",function(){ mode="num"; this.classList.add("on"); $("mPrime").classList.remove("on"); reset(); });
 $("maxT").addEventListener("input",function(){ maxT=+this.value; $("maxTv").textContent=maxT; });
 $("maxT").addEventListener("change",reset);
 window.addEventListener("resize",draw);
