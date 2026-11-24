@@ -13,7 +13,7 @@ Draw a circle of radius 3 standing on a line. Next to it, a circle of radius 5, 
 ## What the page covers
 
 1. **The circles:** one circle of prime radius for every prime, each touching the next.
-2. **Complex numbers are not complex:** *i* is just a quarter-turn; the "imaginary" axis is the direction at right angles to the number line.
+2. **Complex numbers are not complex:** *i* is just a quarter-turn; the "imaginary" axis is the direction at right angles to the number line. For a 3D version with a sphere, see [Complex numbers are not imaginary](https://ninjas1337.github.io/Imaginary-numbers-are-real/).
 3. **The wobble:** how far each centre lies from the smooth curve, for every prime up to 100 million.
 4. **The wobble is music:** its hidden frequencies are the zeta zeros; with random numbers they disappear. The wobble rebuilt from "wheels", one per zero.
 5. **What the hypothesis says:** all wheels stay the same size. Move one zero off the critical line and the wobble runs away.
@@ -36,7 +36,7 @@ python3 scripts/build_page.py     # embeds the data into index.html
 
 Concept and construction: **Sanjin Redzic** ([ORCID 0009-0006-7034-6869](https://orcid.org/0009-0006-7034-6869)). Code and computations written with Claude (Anthropic).
 
-Related: [Prime Helix](https://github.com/ninjas1337/Prime-Helix) · [Gibbs phenomenon explained geometrically](https://github.com/ninjas1337/Fourier-Gibbs-Phenomenon-Explained-Geometrically)
+Related: [Complex numbers are not imaginary](https://ninjas1337.github.io/Imaginary-numbers-are-real/) (a sphere seen from the front and from above) · [Prime Helix](https://github.com/ninjas1337/Prime-Helix) · [Gibbs phenomenon explained geometrically](https://github.com/ninjas1337/Fourier-Gibbs-Phenomenon-Explained-Geometrically)
 
 ## References
 
