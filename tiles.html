@@ -71,6 +71,7 @@ a{color:var(--line)}
     <div class="row">
       <button id="mAll" class="on" type="button">Primes as 1×p</button>
       <button id="mPrime" type="button">Prime × prime only</button>
+      <button id="mPerf" type="button">Perfect, no gaps</button>
       <label for="maxT">Stop after <input id="maxT" type="range" min="20" max="400" value="100"> <b class="num" id="maxTv">100</b> tiles</label>
     </div>
     <p class="read">Colour = the short side:  <span class="key" style="background:var(--hot)"></span>1 (a prime's strip)  <span class="key" style="background:#e3b15c"></span>2  <span class="key" style="background:var(--zeta)"></span>3  <span class="key" style="background:var(--line)"></span>4 or 5  <span class="key" style="background:#b9a3e3"></span>6 and up
@@ -94,11 +95,19 @@ Dark background showing through = a gap.</p>
   <p>Every composite tile is at least 2 wide. A crack only 1 unit wide can only ever be filled by a prime's 1×p strip, because the primes are the only numbers whose one and only rectangle is a single unit wide. They keep arriving forever, ever longer, at irregular moments: the same irregularity that the Riemann Hypothesis is about.</p>
   <p>Switch to <b>prime × prime only</b> to see the opposite: only rectangles with two prime sides (2×2, 2×3, 3×3, 2×5, …). Every tile is then at least 2 wide, the 1-wide cracks stay open forever, and the cluster covers noticeably less of its disc.</p>
   <div class="callout"><p>Composites build the walls; the primes are the thin strips that seal them.</p></div>
+</section>
+
+<section>
+  <h2>Perfect, no gaps</h2>
+  <p>Packing tightly always leaves holes. The <b>Perfect</b> mode follows a different rule, in the spirit of Henle and Henle's tiling of the plane by one square of every size: the tiled area is a complete rectangle at every step.</p>
+  <p>Take the smallest tile not yet used and lay it along one side of the rectangle. Fill the rest of that side with one or two unused tiles of exactly the right size, so the result is again a perfect rectangle. Then move on to the next side: right, top, left, bottom. Fitting fillers always exist, because only finitely many tiles have been used and there are infinitely many composite rectangles of every width from 2 up, plus unused prime strips wherever a width of 1 is needed.</p>
+  <p>So every tile eventually gets its turn, no tile is ever used twice, and the rectangle grows in every direction without a single gap. Carried on forever, this tiles the whole plane, with every prime as one 1×p strip and every rectangle of every other number exactly once. The covered area always equals the rectangle.</p>
+  <p>The price is order. Fillers are pulled forward out of turn, so the largest number used runs further and further ahead of the smallest one still waiting (the trace under the tiling, on a log scale). The Henles noticed the same extravagance in their square tiling. Unlike a Penrose tiling, which reuses two shapes by local rules, this one uses every shape exactly once, by a global rule.</p>
   <p>Whether the prime×prime rectangles, one of each, could tile the whole plane with a cleverer rule than this greedy one, I do not know of a result. For squares the question is settled: one square of every whole-number side tiles the plane (Henle and Henle, 2008), but squares with prime sides cannot (Henle and Henle, 2015).</p>
 </section>
 
 <footer>
-  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a>. The packing rule is a simple greedy heuristic, chosen for clarity, not an optimal packing.</p>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a>. The packing rule is a simple greedy heuristic, chosen for clarity, not an optimal packing. The Perfect mode is a Henle-style construction of my own for this tile set, not a published theorem.</p>
   <ol>
     <li>F. V. Henle &amp; J. M. Henle, Squaring the plane, <i>Amer. Math. Monthly</i> 115 (2008), 3–12.</li>
     <li>J. M. Henle &amp; F. V. Henle, Squaring the plane, and the even numbers, <i>Amer. Math. Monthly</i> (2015); see also the survey at squaring.net.</li>
@@ -116,26 +125,40 @@ const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
 const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function isPrime(n){if(n<2)return false;for(let q=2;q*q<=n;q++) if(n%q===0) return false;return true;}
-function tileList(mode,count){ // rectangles a×b (a ≤ b) ordered by area, then by a
+// The tile set for the numbers: each prime p as 1×p, every other number as all its rectangles a×b with 2 ≤ a ≤ b.
+function validNum(a,b){ const p=Math.min(a,b), q=Math.max(a,b); if(p<1) return false; if(p===1) return isPrime(q); return true; }
+function tileList(mode,count){ // rectangles a×b (a ≤ b) ordered by area n, then by a
   const L=[];
   for(let n=2;L.length<count;n++){
     for(let a=1;a*a<=n;a++){ if(n%a) continue; const b=n/a;
       if(mode==="prime"){ if(isPrime(a)&&isPrime(b)) L.push([a,b]); }
-      else { if(a===1){ if(isPrime(b)) L.push([1,b]); } else L.push([a,b]); }   // primes as 1×p, composites as all rectangles with sides ≥ 2
+      else { if(a===1){ if(isPrime(b)) L.push([1,b]); } else L.push([a,b]); }
       if(L.length>=count) break; }
   }
   return L;
 }
 let mode="num", maxT=100, tiles=[], order=[], idx=0, running=!reduce, dens=[], acc=0, done=false;
-function reset(){ order=tileList(mode,maxT); tiles=[]; idx=0; dens=[]; done=false;
-  const [a,b]=order[0]; tiles.push({x:-b/2,y:-a/2,w:b,h:a,a,b}); idx=1; dens.push(density()); draw(); }
+// perfect-mode state
+let used=new Set(), R=null, dir=0, seqN=2, seqA=1, ahead=[];
+const key=(a,b)=>Math.min(a,b)+"×"+Math.max(a,b);
 
+function reset(){
+  tiles=[]; dens=[]; done=false; acc=0;
+  if(mode==="perfect"){ used=new Set(); dir=0; seqN=2; seqA=1; ahead=[];
+    const T=nextUnused(); addTile(0,0,T[1],T[0],T); R={x0:0,x1:T[1],y0:0,y1:T[0]}; ahead.push(ratio());
+  } else {
+    order=tileList(mode,maxT); const [a,b]=order[0]; tiles.push({x:-b/2,y:-a/2,w:b,h:a,a,b}); idx=1; dens.push(density());
+  }
+  draw();
+}
+
+/* ---------- packing modes ---------- */
 function overlaps(x,y,w,h){ for(const t of tiles){ if(x<t.x+t.w-1e-9&&t.x<x+w-1e-9&&y<t.y+t.h-1e-9&&t.y<y+h-1e-9) return true; } return false; }
 function contact(x,y,w,h){ let c=0; for(const t of tiles){
   if(Math.abs(x-(t.x+t.w))<1e-9||Math.abs(t.x-(x+w))<1e-9){ const o=Math.min(y+h,t.y+t.h)-Math.max(y,t.y); if(o>0) c+=o; }
   if(Math.abs(y-(t.y+t.h))<1e-9||Math.abs(t.y-(y+h))<1e-9){ const o=Math.min(x+w,t.x+t.w)-Math.max(x,t.x); if(o>0) c+=o; } } return c; }
 function farCorner(x,y,w,h){ const xs=[x,x+w], ys=[y,y+h]; let m=0; for(const u of xs) for(const v of ys) m=Math.max(m,u*u+v*v); return m; }
-function place(){
+function placePacked(){
   if(idx>=order.length){ done=true; return false; }
   const [a,b]=order[idx]; const dims=a===b?[[a,a]]:[[b,a],[a,b]];
   let best=null;
@@ -152,51 +175,130 @@ function place(){
   tiles.push({x:best.x,y:best.y,w:best.w,h:best.h,a,b}); idx++; dens.push(density()); return true;
 }
 function density(){ let A=0,R2=0; for(const t of tiles){ A+=t.w*t.h; R2=Math.max(R2,farCorner(t.x,t.y,t.w,t.h)); } return A/(Math.PI*R2); }
+
+/* ---------- perfect mode: the tiled area is always a complete rectangle ---------- */
+function nextUnused(){ // smallest tile of the number sequence that is not used yet
+  for(;;){
+    while(seqA*seqA<=seqN){ const a=seqA++; if(seqN%a) continue; const b=seqN/a;
+      if(validNum(a,b)&&!(a===1&&!isPrime(b))&&!used.has(key(a,b))) return [a,b]; }
+    seqN++; seqA=1;
+  }
+}
+function smallestUnusedArea(){ const sN=seqN, sA=seqA; const T=nextUnused(); seqN=sN; seqA=sA; return T[0]*T[1]; }
+function addTile(x,y,w,h,T,filler){ const a=Math.min(w,h), b=Math.max(w,h); used.add(key(a,b)); tiles.push({x,y,w,h,a,b,filler:!!filler}); }
+function ok(a,b,taken){ return validNum(a,b)&&!used.has(key(a,b))&&!taken.includes(key(a,b)); }
+// map a strip in local coordinates (u along the side from its start, v outward) to world rectangles
+function toWorld(d,u,v,du,dv){
+  if(d===0) return [R.x1+v, R.y0+u, dv, du];          // right side, along y
+  if(d===1) return [R.x0+u, R.y1+v, du, dv];          // top, along x
+  if(d===2) return [R.x0-v-dv, R.y0+u, dv, du];       // left
+  return [R.x0+u, R.y0-v-dv, du, dv];                  // bottom
+}
+function planStrip(d,T){ // best way to attach T plus fillers along side d, or null
+  const L=(d%2===0)?(R.y1-R.y0):(R.x1-R.x0);
+  const k0=key(T[0],T[1]); let best=null;
+  const orients=T[0]===T[1]?[[T[0],T[1]]]:[[T[0],T[1]],[T[1],T[0]]];
+  for(const [s,t] of orients){ // s along the side, t outward
+    if(s>L) continue;
+    if(s===L){ const plan={thick:t,parts:[[0,0,s,t,true]]}; if(!best||plan.thick<best.thick) best=plan; continue; }
+    if(ok(L-s,t,[k0])){ const plan={thick:t,parts:[[0,0,s,t,true],[s,0,L-s,t,false]]}; if(!best||plan.thick<best.thick) best=plan; }
+    for(let c=1;c<=400;c++){
+      if(best&&t+c>=best.thick) break;
+      const k1=key(s,c), k2=key(L-s,t+c);
+      if(k1===k2) continue;
+      if(ok(s,c,[k0])&&ok(L-s,t+c,[k0,k1])){ best={thick:t+c,parts:[[0,0,s,t,true],[0,t,s,c,false],[s,0,L-s,t+c,false]]}; break; }
+    }
+  }
+  return best;
+}
+function placePerfect(){
+  if(tiles.length>=maxT){ done=true; return false; }
+  const sN=seqN, sA=seqA; const T=nextUnused();
+  for(let k=0;k<4;k++){
+    const d=(dir+k)%4, plan=planStrip(d,T);
+    if(!plan) continue;
+    for(const [u,v,du,dv,isT] of plan.parts){ const [x,y,w,h]=toWorld(d,u,v,du,dv); addTile(x,y,w,h,T,!isT); }
+    if(d===0) R.x1+=plan.thick; else if(d===1) R.y1+=plan.thick; else if(d===2) R.x0-=plan.thick; else R.y0-=plan.thick;
+    dir=(d+1)%4; ahead.push(ratio()); return true;
+  }
+  // T is longer than every side: widen the rectangle with one full-side tile first
+  seqN=sN; seqA=sA;
+  const d=dir, L=(d%2===0)?(R.y1-R.y0):(R.x1-R.x0);
+  for(let th=1;th<=4000;th++){ if(ok(L,th,[])){ const [x,y,w,h]=toWorld(d,0,0,L,th); addTile(x,y,w,h,null,true);
+      if(d===0) R.x1+=th; else if(d===1) R.y1+=th; else if(d===2) R.x0-=th; else R.y0-=th; break; } }
+  dir=(dir+1)%4; ahead.push(ratio()); return true;
+}
+function ratio(){ let m=0; for(const t of tiles) m=Math.max(m,t.a*t.b); return m/smallestUnusedArea(); }
+
+/* ---------- drawing ---------- */
 function colour(a){ return a===1?C.hot:a===2?C.two:a===3?C.zeta:a<=5?C.line:C.seven; }
 function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
-
 function draw(){
   const {g,w:W,h:H,d}=fit($("cvT"));
-  let R=4; for(const t of tiles) R=Math.max(R,Math.sqrt(farCorner(t.x,t.y,t.w,t.h)));
-  const s=Math.min(W,H)*0.47/R, cx=W/2, cy=H/2;
-  g.strokeStyle="rgba(127,196,232,0.25)"; g.setLineDash([4*d,4*d]); g.lineWidth=1*d; g.beginPath(); g.arc(cx,cy,R*s,0,2*Math.PI); g.stroke(); g.setLineDash([]);
-  g.font=Math.max(9,Math.min(13,s*0.9))*d/ (d>1?1:1)+"px "+MONO; g.textAlign="center"; g.textBaseline="middle";
+  let s,cx,cy,ox=0,oy=0;
+  if(mode==="perfect"){
+    const bw=R.x1-R.x0, bh=R.y1-R.y0; s=Math.min(W,H)*0.92/Math.max(bw,bh); cx=W/2; cy=H/2; ox=(R.x0+R.x1)/2; oy=(R.y0+R.y1)/2;
+  } else {
+    let Rr=4; for(const t of tiles) Rr=Math.max(Rr,Math.sqrt(farCorner(t.x,t.y,t.w,t.h)));
+    s=Math.min(W,H)*0.47/Rr; cx=W/2; cy=H/2;
+    g.strokeStyle="rgba(127,196,232,0.25)"; g.setLineDash([4*d,4*d]); g.lineWidth=1*d; g.beginPath(); g.arc(cx,cy,Rr*s,0,2*Math.PI); g.stroke(); g.setLineDash([]);
+  }
+  g.font=Math.max(9,Math.min(13,s*0.9))*d+"px "+MONO; g.textAlign="center"; g.textBaseline="middle";
   tiles.forEach((t,i)=>{
-    const x=cx+t.x*s, y=cy-(t.y+t.h)*s, w=t.w*s, h=t.h*s, col=colour(t.a);
-    g.fillStyle=col; g.globalAlpha=(i===tiles.length-1&&!done)?0.95:0.62; g.fillRect(x,y,w,h); g.globalAlpha=1;
+    const x=cx+(t.x-ox)*s, y=cy-(t.y+t.h-oy)*s, w=t.w*s, h=t.h*s, col=colour(t.a);
+    g.fillStyle=col; g.globalAlpha=(i>=tiles.length-3&&!done&&mode==="perfect")||(i===tiles.length-1&&!done)?0.95:0.62; g.fillRect(x,y,w,h); g.globalAlpha=1;
     g.strokeStyle="#081a2e"; g.lineWidth=Math.max(0.6,Math.min(1.6,s*0.12))*d; g.strokeRect(x,y,w,h);
     const lab=t.a+"×"+t.b, tw=g.measureText(lab).width;
     if(h>12*d&&tw<w-4*d){ g.fillStyle="#081a2e"; g.fillText(lab,x+w/2,y+h/2); }
   });
   g.textAlign="left"; g.textBaseline="alphabetic";
   const last=tiles[tiles.length-1];
-  $("readT").textContent="Tiles placed: "+tiles.length+" of "+order.length+(done?"  (finished)":"")+".  Latest: "+last.a+"×"+last.b+" = "+(last.a*last.b)+
-    (idx<order.length?".  Next: "+order[idx][0]+"×"+order[idx][1]:"")+".";
+  if(mode==="perfect"){
+    $("readT").textContent="Tiles placed: "+tiles.length+(done?"  (finished)":"")+".  Rectangle "+(R.x1-R.x0)+" × "+(R.y1-R.y0)+", no gaps.  Latest: "+last.a+"×"+last.b+
+      ".  Smallest number not yet used: "+smallestUnusedArea()+".";
+  } else {
+    $("readT").textContent="Tiles placed: "+tiles.length+" of "+order.length+(done?"  (finished)":"")+".  Latest: "+last.a+"×"+last.b+" = "+(last.a*last.b)+
+      (idx<order.length?".  Next: "+order[idx][0]+"×"+order[idx][1]:"")+".";
+  }
   drawG();
 }
 function drawG(){
   const {g,w:W,h:H,d}=fit($("cvG"));
-  const pad=8*d, n=Math.max(2,dens.length);
+  const pad=8*d;
   g.strokeStyle=C.grid; g.lineWidth=1; for(const v of [0.25,0.5,0.75]){ const y=H-pad-(H-2*pad)*v; g.beginPath(); g.moveTo(pad,y); g.lineTo(W-pad,y); g.stroke(); }
-  g.fillStyle=C.muted; g.font=(10*d)+"px "+MONO; g.fillText("100%",pad,pad+8*d); g.fillText("50%",pad,H-pad-(H-2*pad)*0.5-3*d);
-  g.strokeStyle=C.brass; g.lineWidth=1.6*d; g.beginPath();
-  dens.forEach((v,i)=>{ const x=pad+(W-2*pad)*i/(maxT-1), y=H-pad-(H-2*pad)*Math.min(1,v); i?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke();
-  let A=0; for(const t of tiles) A+=t.w*t.h;
-  $("readG").textContent="Covered area "+A+",  disc coverage "+(100*dens[dens.length-1]).toFixed(1)+"%  (tile area ÷ area of the smallest disc around the cluster)";
+  g.fillStyle=C.muted; g.font=(10*d)+"px "+MONO;
+  if(mode==="perfect"){
+    const top=Math.max(2,...ahead.map(v=>Math.log10(Math.max(1,v))));
+    g.fillText("×10^"+top.toFixed(1),pad,pad+8*d);
+    g.strokeStyle=C.hot; g.lineWidth=1.6*d; g.beginPath();
+    ahead.forEach((v,i)=>{ const x=pad+(W-2*pad)*i/Math.max(1,maxT/2), y=H-pad-(H-2*pad)*Math.log10(Math.max(1,v))/top; i?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke();
+    let A=0; for(const t of tiles) A+=t.w*t.h;
+    $("readG").textContent="Covered area "+A+" = the whole "+(R.x1-R.x0)+"×"+(R.y1-R.y0)+" rectangle (100%).  Trace: largest number used ÷ smallest not yet used, log scale. The fillers run ahead of the order, more and more.";
+  } else {
+    g.fillText("100%",pad,pad+8*d); g.fillText("50%",pad,H-pad-(H-2*pad)*0.5-3*d);
+    g.strokeStyle=C.brass; g.lineWidth=1.6*d; g.beginPath();
+    dens.forEach((v,i)=>{ const x=pad+(W-2*pad)*i/(maxT-1), y=H-pad-(H-2*pad)*Math.min(1,v); i?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke();
+    let A=0; for(const t of tiles) A+=t.w*t.h;
+    $("readG").textContent="Covered area "+A+",  disc coverage "+(100*dens[dens.length-1]).toFixed(1)+"%  (tile area ÷ area of the smallest disc around the cluster)";
+  }
 }
+function step(){ return mode==="perfect"?placePerfect():placePacked(); }
 function frame(){
-  if(running&&!done){ acc+=(+$("speed").value)/20; let k=0; while(acc>=1&&k<20){ acc-=1; if(!place()) break; k++; } if(k) draw(); if(done){ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); draw(); } }
+  if(running&&!done){ acc+=(+$("speed").value)/20; let k=0; while(acc>=1&&k<20){ acc-=1; if(!step()) break; k++; } if(k) draw(); if(done){ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); draw(); } }
   requestAnimationFrame(frame);
 }
+function setMode(m,btn){ mode=m; for(const id of ["mAll","mPrime","mPerf"]) $(id).classList.toggle("on",id===btn); reset(); }
 $("run").addEventListener("click",function(){ if(done){reset();} running=!running; this.textContent=running?"Pause":"Run"; this.classList.toggle("on",running); });
-$("stepB").addEventListener("click",()=>{ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); if(place()) draw(); else draw(); });
+$("stepB").addEventListener("click",()=>{ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); step(); draw(); });
 $("reset").addEventListener("click",reset);
-$("mPrime").addEventListener("click",function(){ mode="prime"; this.classList.add("on"); $("mAll").classList.remove("on"); reset(); });
-$("mAll").addEventListener("click",function(){ mode="num"; this.classList.add("on"); $("mPrime").classList.remove("on"); reset(); });
+$("mAll").addEventListener("click",()=>setMode("num","mAll"));
+$("mPrime").addEventListener("click",()=>setMode("prime","mPrime"));
+$("mPerf").addEventListener("click",()=>setMode("perfect","mPerf"));
 $("maxT").addEventListener("input",function(){ maxT=+this.value; $("maxTv").textContent=maxT; });
 $("maxT").addEventListener("change",reset);
 window.addEventListener("resize",draw);
 if(reduce){ $("run").textContent="Run"; $("run").classList.remove("on"); }
+window.__tiling=()=>({mode,tiles:tiles.map(t=>[t.x,t.y,t.w,t.h,t.a,t.b]),R});   // read-only hook for checking the tiling
 reset(); requestAnimationFrame(frame);
 })();
 </script>

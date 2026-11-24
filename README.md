@@ -47,7 +47,7 @@ Every whole number drawn as all of its rectangles a×b at once, centred, equal i
 
 👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/tiles.html**
 
-The numbers in order as tiles: each prime a thin 1×p strip, every other number all of its rectangles with sides of at least 2 (4 → 2×2, 6 → 2×3, 8 → 2×4, 9 → 3×3, 12 → 2×6 and 3×4, …), placed greedily where the farthest corner stays closest to the start, with a disc-coverage trace. Composite tiles are at least 2 wide, so only the primes' strips can seal 1-wide cracks: the primes are the mortar. A second mode uses only prime×prime rectangles for comparison.
+The numbers in order as tiles: each prime a thin 1×p strip, every other number all of its rectangles with sides of at least 2 (4 → 2×2, 6 → 2×3, 8 → 2×4, 9 → 3×3, 12 → 2×6 and 3×4, …), placed greedily where the farthest corner stays closest to the start, with a disc-coverage trace. Composite tiles are at least 2 wide, so only the primes' strips can seal 1-wide cracks: the primes are the mortar. A second mode uses only prime×prime rectangles for comparison. A third, **Perfect**, keeps the tiled area a complete rectangle at every step (Henle-style: smallest unused tile along one side, exact-size unused fillers, rotating sides), so the plane is tiled with no gaps, every tile used exactly once; the page exposes the tiles so the gap-free property can be checked.
 
 ## Mathematical background
 
