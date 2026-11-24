@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Riemann Hypothesis, Drawn with Circles</title>
+<meta name="description" content="The most famous problem in mathematics, explained with circles of prime radius. Interactive, no formulas needed.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Riemann Hypothesis, Drawn with Circles">
+<meta property="og:description" content="One circle for every prime. Their centres wobble, the wobble hides the zeta zeros, and the Riemann Hypothesis says how big the wobble can get.">
+<meta property="og:url" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: one reading column of ~68ch; each step is prose followed by a full-width figure panel */
+  --bg:#f4f5f7;
+  --panel:#ffffff;
+  --ink:#16202c;
+  --muted:#5d6876;
+  --line:#d8dde3;
+  --accent:#1d5fa8;
+  --accent-soft:#dce8f6;
+  --prime:#c4621b;
+  --prime-soft:#f6e4d6;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f141a; --panel:#161d26; --ink:#e3e8ee; --muted:#93a0ae; --line:#2a3440;
+    --accent:#6aa8ec; --accent-soft:#1a2b40; --prime:#f0954f; --prime-soft:#3a2516; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#161d26; --ink:#e3e8ee; --muted:#93a0ae; --line:#2a3440;
+  --accent:#6aa8ec; --accent-soft:#1a2b40; --prime:#f0954f; --prime-soft:#3a2516; color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:18px;line-height:1.6}
+main{max-width:860px;margin:0 auto;padding:32px 16px 64px;display:grid;gap:44px}
+header h1{font-family:var(--font-display);font-weight:600;font-size:clamp(2.1rem,6vw,3.3rem);line-height:1.08;margin:0 0 14px;text-wrap:balance}
+header h1 em{color:var(--prime);font-style:italic;font-weight:400}
+.lede{font-size:1.15rem;color:var(--muted);max-width:62ch;margin:0}
+.byline{font-size:.9rem;color:var(--muted);margin-top:14px}
+section{display:grid;gap:16px}
+.step{font-family:var(--font-mono);font-size:.8rem;color:var(--accent);letter-spacing:.06em}
+h2{font-family:var(--font-display);font-weight:600;font-size:clamp(1.5rem,4vw,2rem);line-height:1.15;margin:0;text-wrap:balance}
+p{margin:0;max-width:68ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:12px}
+canvas{display:block;width:100%;border-radius:8px;background:var(--bg);touch-action:pan-y}
+.c-wide{aspect-ratio:2.2/1}
+.c-circ{aspect-ratio:3.4/1}
+.c-med{aspect-ratio:1.8/1}
+.c-sq{aspect-ratio:1.25/1}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:.95rem}
+.controls label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--accent);width:min(320px,100%)}
+button{font:inherit;font-size:.92rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.on{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.readout{font-family:var(--font-mono);font-size:.88rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.readout b{color:var(--ink);font-weight:500}
+.cap{font-size:.9rem;color:var(--muted)}
+.key{display:inline-block;width:.9em;height:.9em;border-radius:50%;vertical-align:-.1em;margin-right:4px}
+.callout{border-left:4px solid var(--prime);background:var(--prime-soft);padding:12px 16px;border-radius:0 8px 8px 0;max-width:68ch}
+.callout p{max-width:none}
+.formula{font-family:var(--font-mono);font-size:.95rem;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;max-width:68ch}
+footer{border-top:1px solid var(--line);padding-top:20px;font-size:.88rem;color:var(--muted);display:grid;gap:10px}
+footer ol{margin:0;padding-left:20px}
+footer li{margin-bottom:4px}
+a{color:var(--accent)}
+@media (max-width:520px){body{font-size:17px}.c-wide{aspect-ratio:1.5/1}.c-circ{aspect-ratio:2.2/1}}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>The Riemann Hypothesis, <em>drawn with circles</em></h1>
+  <p class="lede">The most famous problem in mathematics, explained with a compass, a ruler and one idea about rotation. No formulas needed until the very end.</p>
+  <p class="byline">By Sanjin Redzic · Interactive: every figure responds to the controls</p>
+</header>
+
+<!-- STEP 1 -->
+<section aria-labelledby="s1">
+  <div class="step">STEP 1 · THE CIRCLES</div>
+  <h2 id="s1">One circle for every prime</h2>
+  <p>Prime numbers are the numbers you can only divide by 1 and themselves: 2, 3, 5, 7, 11, 13, … Start at 3. Draw a circle of radius 3 standing on a line. Next to it, a circle of radius 5, placed so the two just touch. Then 7, then 11, and so on: one circle for every prime, each touching the one before.</p>
+  <div class="panel">
+    <canvas id="cv1" class="c-circ" role="img" aria-label="Circles of prime radius standing on a line, each touching the next"></canvas>
+    <div class="controls">
+      <label for="n1">Circles: <input id="n1" type="range" min="3" max="30" value="12"> <span class="readout" id="n1v"><b>12</b></span></label>
+      <button id="curve1" class="on" type="button">Show smooth curve</button>
+    </div>
+    <p class="readout" id="r1"></p>
+  </div>
+  <p>Mark the centre of every circle. The primes jump around unpredictably, yet the centres line up surprisingly well along a smooth curve (dashed). That curve comes from the <b>prime number theorem</b> from 1896, which tells us how many primes there are on average. The dots never sit exactly on it, though. That tiny mismatch is what the whole story is about.</p>
+</section>
+
+<!-- STEP 2 -->
+<section aria-labelledby="s2">
+  <div class="step">STEP 2 · COMPLEX NUMBERS ARE NOT COMPLEX</div>
+  <h2 id="s2">The imaginary direction is just sideways</h2>
+  <p>To describe a centre we need two numbers: how far along the line it is, and how high up. Mathematicians write this as one number, <b>x + i·y</b>, and call it a complex number. The name is unlucky. Nothing is complex or imaginary about it.</p>
+  <p>Think of <b>i</b> as an instruction: <i>turn a quarter of a circle</i>. Multiply by i once and an arrow pointing right now points up. Twice, and it points left, which is why i·i = −1. The "imaginary" axis is simply the direction at right angles to the ordinary number line. It was there all along; we just usually look along the line and don't see it.</p>
+  <div class="panel">
+    <canvas id="cv2" class="c-sq" role="img" aria-label="An arrow in the plane that turns a quarter circle each time it is multiplied by i"></canvas>
+    <div class="controls">
+      <button id="timesI" type="button">Multiply by i (turn 90°)</button>
+      <button id="reset2" type="button">Start again</button>
+      <span class="readout" id="r2"></span>
+    </div>
+  </div>
+  <p>So every circle centre is one complex number: the real part says how far along, the imaginary part is the prime itself, the height. Seen from the origin, each centre also has an angle. That angle will turn out to carry the whole secret.</p>
+</section>
+
+<!-- STEP 3 -->
+<section aria-labelledby="s3">
+  <div class="step">STEP 3 · THE WOBBLE</div>
+  <h2 id="s3">The centres wobble around the curve</h2>
+  <p>Measure how far each centre lies from the smooth curve. After a cluster of primes that are close together, the chain gets ahead of the curve. After a big gap between primes, it falls behind. Most of the time it sits a little behind; that slight lean is itself a known effect of the primes. The first time the chain catches up and crosses the curve is at the circles 109 and 113, right before the big gap to 127.</p>
+  <div class="panel">
+    <canvas id="cv3" class="c-wide" role="img" aria-label="Distance of each circle centre from the smooth curve, for the first primes"></canvas>
+    <div class="controls">
+      <label for="n3">Primes up to: <input id="n3" type="range" min="2" max="5" step="0.01" value="3"> <span class="readout" id="n3v"></span></label>
+    </div>
+    <p class="cap"><span class="key" style="background:var(--prime)"></span>Centre ahead of the curve <span class="key" style="background:var(--accent);margin-left:12px"></span>Centre behind the curve</p>
+  </div>
+  <p>The wobble grows as the circles grow. Scale it by the size the theory expects, and something remarkable appears: for every prime up to 100 million, the wobble stays in the same band, swinging up and down in an irregular but strangely rhythmic way.</p>
+  <div class="panel">
+    <canvas id="cv3b" class="c-wide" role="img" aria-label="The scaled wobble for primes from one thousand to one hundred million"></canvas>
+    <p class="cap">Scaled wobble for every prime from 1,000 to 100,000,000 (horizontal axis on a log scale).</p>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section aria-labelledby="s4">
+  <div class="step">STEP 4 · THE WOBBLE IS MUSIC</div>
+  <h2 id="s4">Hidden notes inside the wobble</h2>
+  <p>A chord on a piano is several notes at once. You can split any wobbly signal into its notes too, a bit like an ear does. Do that with the wobble of the circles, and clear notes ring out at <b>14.13, 21.02, 25.01, 30.42, 32.94, …</b></p>
+  <div class="panel">
+    <canvas id="cv4" class="c-wide" role="img" aria-label="Frequency spectrum of the wobble, with peaks at the zeros of the zeta function"></canvas>
+    <div class="controls">
+      <button id="sp-real" class="on" type="button">Real primes</button>
+      <button id="sp-rand" type="button">Random numbers instead</button>
+      <span class="readout" id="r4"></span>
+    </div>
+    <p class="cap">Dashed lines: the zeros of the Riemann zeta function. Same circles, same method; the random numbers have the same density as the primes.</p>
+  </div>
+  <p>Those numbers are famous. They are the <b>zeros of the Riemann zeta function</b>, found by Bernhard Riemann in 1859. Swap the primes for random numbers of the same density and the notes vanish. The music belongs to the primes.</p>
+  <p>Each note behaves like a wheel turning at its own speed. Put wheels on wheels, one per note, and follow the tip: it reproduces the wobble. The more wheels, the closer the match.</p>
+  <div class="panel">
+    <canvas id="cv4b" class="c-wide" role="img" aria-label="The wobble rebuilt from a chosen number of wheels compared with the measured wobble"></canvas>
+    <div class="controls">
+      <label for="k4">Wheels (zeros): <input id="k4" type="range" min="1" max="138" value="10"> <span class="readout" id="k4v"></span></label>
+    </div>
+    <p class="cap"><span class="key" style="background:var(--muted)"></span>Measured wobble, primes from 1 million to 100 million <span class="key" style="background:var(--accent);margin-left:12px"></span>Rebuilt from wheels only</p>
+  </div>
+</section>
+
+<!-- STEP 5 -->
+<section aria-labelledby="s5">
+  <div class="step">STEP 5 · WHAT THE HYPOTHESIS SAYS</div>
+  <h2 id="s5">All wheels stay the same size</h2>
+  <p>Riemann noticed that his zeros all seemed to lie on one straight line in the plane of complex numbers, the <i>critical line</i>. His hypothesis is that <b>every</b> zero lies there, infinitely many of them.</p>
+  <p>In the circle picture this has a simple meaning. A zero on the line is a wheel that keeps its size. A zero off the line would be a wheel that keeps growing. Try it: move the first zero off the line and watch what happens to the wobble far out.</p>
+  <div class="panel">
+    <canvas id="cv5" class="c-wide" role="img" aria-label="Model wobble out to ten to the forty, with the first zero optionally moved off the critical line"></canvas>
+    <div class="controls">
+      <label for="b5">Position of the first zero: <input id="b5" type="range" min="0.5" max="0.6" step="0.001" value="0.5"> <span class="readout" id="b5v"></span></label>
+    </div>
+    <p class="cap">Wobble built from the first 138 zeros, out to primes of size 10⁴⁰. Real part ½ means on the critical line.</p>
+  </div>
+  <div class="callout">
+    <p><b>The Riemann Hypothesis, in circle language:</b> the wobble of the prime circles never grows beyond the size you see here, no matter how far you go. The primes are as regular as they can possibly be.</p>
+  </div>
+  <div class="formula">all zeros on Re(s) = ½  ⟺  wobble stays within about y<sup>1.5</sup> for every prime radius y</div>
+  <p class="cap">This equivalence is a classical theorem by Helge von Koch (1901), written here in terms of the circles.</p>
+</section>
+
+<!-- STEP 6 -->
+<section aria-labelledby="s6">
+  <div class="step">STEP 6 · WHERE IT STANDS</div>
+  <h2 id="s6">Checked by computers, proved this year?</h2>
+  <p>For more than 160 years nobody could prove it, although computers checked trillions of zeros and found every one of them on the line. In November 2026, mathematician Levent Alpöge announced a proof developed together with an AI model, written in the proof language Lean. The Lean and Mathlib communities certified it the next day. The written-out version runs past 250,000 pages, and mathematicians are now working to understand it. Some groups still dispute whether a proof nobody can read counts.</p>
+  <p>If it stands, the picture above is now a fact about all primes, forever: the circles never stray further from their curve than the wheels allow.</p>
+  <p>It would also settle far more than one question. For over a century, mathematicians have proved hundreds of results that begin with the words <i>“assuming the Riemann Hypothesis is true”</i>: about how primes are spread out, how fast we can test whether a number is prime, and much more. Alpöge's proof also claims the generalized version of the hypothesis. If it holds, all of those results stop being conditional and become theorems at once. Mankind would have the proof, and everything built on it, before anyone fully understands why it works.</p>
+  <h2 id="s7" style="margin-top:12px">Why I made this</h2>
+  <p>Just as the mathematician behind the new proof worked with an AI model, I used Claude to write the code and run the computations for this page. My own small contribution is the circles, and the wish behind them: I want more people to understand this beautiful problem. Riemann's original framing, with the zeta function and its analytic continuation, can look forbidding. The beauty underneath it is not.</p>
+  <p>Complex numbers are one of the main building blocks of mathematics, and they are not mysterious: they are the ordinary numbers plus one quarter-turn. With that single idea, a compass and a row of prime circles, you can see what the most famous problem in mathematics is really about.</p>
+</section>
+
+<footer>
+  <p>Concept and construction: Sanjin Redzic. Numerics computed for every prime up to 10⁸; zeros from Odlyzko's tables and a Riemann–Siegel computation. Source code and data: <a href="https://github.com/ninjas1337/Riemann-Hypothesis-Drawn-with-Circles">GitHub</a>. Part of the <a href="https://github.com/ninjas1337/Prime-Helix">Prime Helix</a> project.</p>
+  <ol>
+    <li>B. Riemann, Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse, <i>Monatsber. Berliner Akad.</i>, 1859.</li>
+    <li>H. von Koch, Sur la distribution des nombres premiers, <i>Acta Math.</i> 24 (1901), 159–182.</li>
+    <li>H. Davenport, <i>Multiplicative Number Theory</i>, 3rd ed., Springer, 2000, ch. 17–18.</li>
+    <li>A. M. Odlyzko, Tables of zeros of the Riemann zeta function.</li>
+    <li>H. Cramér, On the order of magnitude of the difference between consecutive prime numbers, <i>Acta Arith.</i> 2 (1936), 23–46.</li>
+    <li>Science News, “Math’s holy grail, the Riemann hypothesis, appears solved with AI’s help”, November 2026.</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+const DATA = __DATA__;
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- maths ---------- */
+function li(x){const L=Math.log(x);let a=L,inner=1,s=a;for(let n=2;n<400;n++){a*=-L/(2*n);if(n%2===1)inner+=1/n;const t=a*inner;s+=t;if(Math.abs(t)<1e-17*Math.abs(s)&&n>L)break;}return 0.5772156649015329+Math.log(L)+Math.sqrt(x)*s;}
+const PMAX=100000, sv=new Uint8Array(PMAX+1), P=[];
+for(let i=2;i<=PMAX;i++){ if(!sv[i]){ if(i>=3) P.push(i); if(i*i<=PMAX) for(let j=i*i;j<=PMAX;j+=i) sv[j]=1; } }
+const X=new Float64Array(P.length); for(let k=1;k<P.length;k++) X[k]=X[k-1]+2*Math.sqrt(P[k-1]*P[k]);
+const smooth = y => 2*li(y*y)-y-3;
+const Z = DATA.zeros;
+
+/* ---------- canvas helper ---------- */
+function setup(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
+function axes(g,w,h,d,pad){g.strokeStyle=css("--line");g.lineWidth=d;g.beginPath();g.moveTo(pad.l,h-pad.b);g.lineTo(w-pad.r,h-pad.b);g.moveTo(pad.l,pad.t);g.lineTo(pad.l,h-pad.b);g.stroke();}
+function txt(g,s,x,y,d,al,base,col,size){g.fillStyle=col||css("--muted");g.font=((size||11)*d)+"px "+css("--font-mono");g.textAlign=al||"left";g.textBaseline=base||"alphabetic";g.fillText(s,x,y);}
+function nice(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const m=v/p;return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+
+/* ---------- step 1: circles ---------- */
+let showCurve=true;
+function draw1(){
+  const n=+$("n1").value; $("n1v").innerHTML="<b>"+n+"</b>";
+  const {g,w,h,d}=setup($("cv1"));
+  const xmin=-P[0], xmax=X[n-1]+P[n-1], ymax=2*P[n-1];
+  const pad=14*d, sc=Math.min((w-2*pad)/(xmax-xmin),(h-2*pad-12*d)/ymax);
+  const ox=pad-xmin*sc+((w-2*pad)-(xmax-xmin)*sc)/2, oy=h-pad;
+  const Xp=x=>ox+x*sc, Yp=y=>oy-y*sc;
+  g.strokeStyle=css("--ink");g.lineWidth=1.5*d;g.beginPath();g.moveTo(pad/2,oy);g.lineTo(w-pad/2,oy);g.stroke();
+  for(let k=0;k<n;k++){
+    g.strokeStyle=css("--accent");g.lineWidth=1.3*d;g.beginPath();g.arc(Xp(X[k]),Yp(P[k]),P[k]*sc,0,2*Math.PI);g.stroke();
+    g.fillStyle=css("--prime");g.beginPath();g.arc(Xp(X[k]),Yp(P[k]),2.6*d,0,2*Math.PI);g.fill();
+    if(P[k]*sc>9*d) txt(g,String(P[k]),Xp(X[k]),Yp(P[k])-6*d,d,"center","bottom",css("--ink"),Math.min(13,Math.max(9,P[k]*sc/(2.6*d))));
+  }
+  if(showCurve){g.strokeStyle=css("--prime");g.setLineDash([5*d,4*d]);g.lineWidth=1.3*d;g.beginPath();
+    for(let i=0;i<=200;i++){const y=3+(P[n-1]*1.05-3)*i/200;const x=smooth(y);i?g.lineTo(Xp(x),Yp(y)):g.moveTo(Xp(x),Yp(y));}
+    g.stroke();g.setLineDash([]);}
+  const k=n-1;
+  $("r1").innerHTML=`Last circle: radius <b>${P[k]}</b>, centre at <b>${X[k].toFixed(1)}</b> along and <b>${P[k]}</b> up. The smooth curve predicts <b>${smooth(P[k]).toFixed(1)}</b> along. For small circles the curve is still rough; it fits better and better as the circles grow.`;
+}
+if(window.innerWidth<520) $("n1").value=8;
+$("n1").addEventListener("input",draw1);
+$("curve1").addEventListener("click",function(){showCurve=!showCurve;this.classList.toggle("on",showCurve);draw1();});
+
+/* ---------- step 2: multiply by i ---------- */
+let ang=Math.atan2(1,2), target=ang, turns=0, anim=0;
+const r0=Math.hypot(2,1);
+function draw2(){
+  const {g,w,h,d}=setup($("cv2"));
+  const cx=w/2, cy=h/2, U=Math.min(w,h)/7;
+  g.strokeStyle=css("--line");g.lineWidth=d;
+  for(let i=-6;i<=6;i++){g.beginPath();g.moveTo(cx+i*U,0);g.lineTo(cx+i*U,h);g.stroke();g.beginPath();g.moveTo(0,cy+i*U);g.lineTo(w,cy+i*U);g.stroke();}
+  g.strokeStyle=css("--ink");g.lineWidth=1.6*d;g.beginPath();g.moveTo(0,cy);g.lineTo(w,cy);g.moveTo(cx,0);g.lineTo(cx,h);g.stroke();
+  txt(g,"real line  →",w-8*d,cy-8*d,d,"right","bottom",css("--ink"),12);
+  txt(g,"↑ imaginary (sideways) direction",cx+8*d,14*d,d,"left","top",css("--ink"),12);
+  g.strokeStyle=css("--accent");g.globalAlpha=.35;g.setLineDash([4*d,4*d]);g.beginPath();g.arc(cx,cy,r0*U,0,2*Math.PI);g.stroke();g.setLineDash([]);g.globalAlpha=1;
+  const ex=cx+r0*U*Math.cos(ang), ey=cy-r0*U*Math.sin(ang);
+  g.strokeStyle=css("--prime");g.fillStyle=css("--prime");g.lineWidth=3*d;g.beginPath();g.moveTo(cx,cy);g.lineTo(ex,ey);g.stroke();
+  const a=Math.atan2(cy-ey,ex-cx);g.beginPath();g.moveTo(ex,ey);g.lineTo(ex-12*d*Math.cos(a-0.4),ey+12*d*Math.sin(a-0.4));g.lineTo(ex-12*d*Math.cos(a+0.4),ey+12*d*Math.sin(a+0.4));g.closePath();g.fill();
+  const re=Math.round(r0*Math.cos(ang)*100)/100, im=Math.round(r0*Math.sin(ang)*100)/100;
+  const fmt=v=>(Math.abs(v)<1e-9?0:v);
+  $("r2").innerHTML=`Arrow = <b>${fmt(re)} ${fmt(im)>=0?"+":"−"} ${Math.abs(fmt(im))}·i</b> · turned ${turns}× by i`;
+}
+function step2(){if(Math.abs(target-ang)<1e-3){ang=target;anim=0;draw2();return;}ang+=(target-ang)*0.18;draw2();anim=requestAnimationFrame(step2);}
+$("timesI").addEventListener("click",()=>{turns++;target+=Math.PI/2;if(reduce){ang=target;draw2();}else if(!anim)anim=requestAnimationFrame(step2);});
+$("reset2").addEventListener("click",()=>{turns=0;ang=target=Math.atan2(1,2);draw2();});
+
+/* ---------- step 3: wobble ---------- */
+function draw3(){
+  const lim=Math.pow(10,+$("n3").value); $("n3v").innerHTML="<b>"+Math.round(lim).toLocaleString("en")+"</b>";
+  const {g,w,h,d}=setup($("cv3")); const pad={l:58*d,r:12*d,t:14*d,b:30*d};
+  let n=0; while(n<P.length&&P[n]<=lim) n++;
+  const E=new Float64Array(n); let mx=1e-9; for(let k=0;k<n;k++){E[k]=X[k]-smooth(P[k]); mx=Math.max(mx,Math.abs(E[k]));}
+  const Xp=p=>pad.l+(p-3)/(lim-3)*(w-pad.l-pad.r), Yp=v=>pad.t+(h-pad.t-pad.b)*(0.5-v/(2*mx*1.08));
+  axes(g,w,h,d,pad);
+  g.strokeStyle=css("--muted");g.lineWidth=d;g.beginPath();g.moveTo(pad.l,Yp(0));g.lineTo(w-pad.r,Yp(0));g.stroke();
+  txt(g,"curve",pad.l+4*d,Yp(0)-4*d,d,"left","bottom");
+  for(let k=0;k<n;k++){g.fillStyle=E[k]>0?css("--prime"):css("--accent");const x=Xp(P[k]);g.fillRect(x-(n<200?1.5:0.6)*d,Math.min(Yp(0),Yp(E[k])),(n<200?3:1.2)*d,Math.abs(Yp(E[k])-Yp(0))||d);}
+  txt(g,"ahead",pad.l-6*d,pad.t+8*d,d,"right","top");txt(g,"behind",pad.l-6*d,h-pad.b-8*d,d,"right","bottom");
+  const st=nice(lim/5); for(let v=0;v<=lim*1.0001;v+=st){const vv=Math.max(v,3);txt(g,Math.round(v).toLocaleString("en"),Xp(vv),h-pad.b+6*d,d,v===0?"left":(v+st>lim*1.0001?"right":"center"),"top");}
+  if(lim<3000){const k=P.indexOf(109);if(k>=0){g.strokeStyle=css("--prime");g.lineWidth=d;g.beginPath();g.moveTo(Xp(111),Yp(0)-3*d);g.lineTo(Xp(111)+18*d,pad.t+22*d);g.stroke();txt(g,"first crossing: 109 and 113",Xp(111)+20*d,pad.t+22*d,d,"left","middle",css("--prime"),11);}}
+}
+$("n3").addEventListener("input",draw3);
+function draw3b(){
+  const {g,w,h,d}=setup($("cv3b")); const pad={l:40*d,r:12*d,t:12*d,b:30*d};
+  const u=DATA.wobble.u, f=DATA.wobble.f, u0=u[0], u1=u[u.length-1];
+  const Xp=v=>pad.l+(v-u0)/(u1-u0)*(w-pad.l-pad.r), Yp=v=>pad.t+(h-pad.t-pad.b)*(0.85-v)/(0.85+2.35);
+  axes(g,w,h,d,pad);
+  for(const v of [0,-1,-2]){g.strokeStyle=css("--line");g.beginPath();g.moveTo(pad.l,Yp(v));g.lineTo(w-pad.r,Yp(v));g.stroke();txt(g,String(v),pad.l-6*d,Yp(v),d,"right","middle");}
+  g.strokeStyle=css("--accent");g.lineWidth=1*d;g.beginPath();for(let i=0;i<u.length;i++){i?g.lineTo(Xp(u[i]),Yp(f[i])):g.moveTo(Xp(u[i]),Yp(f[i]));}g.stroke();
+  for(let e=3;e<=8;e++){txt(g,"10"+["⁰","¹","²","³","⁴","⁵","⁶","⁷","⁸"][e],Xp(e*Math.LN10),h-pad.b+6*d,d,"center","top");}
+}
+
+/* ---------- step 4: spectrum and wheels ---------- */
+let specMode="real";
+function draw4(){
+  const {g,w,h,d}=setup($("cv4")); const pad={l:16*d,r:12*d,t:12*d,b:30*d};
+  const t=DATA.spec.t, A=DATA.spec[specMode], amax=Math.max(...DATA.spec.real,...DATA.spec.random)*1.05;
+  const Xp=v=>pad.l+(v-t[0])/(t[t.length-1]-t[0])*(w-pad.l-pad.r), Yp=v=>h-pad.b-(v/amax)*(h-pad.t-pad.b);
+  axes(g,w,h,d,pad);
+  g.setLineDash([3*d,4*d]);g.strokeStyle=css("--muted");g.lineWidth=d;
+  for(const z of Z.slice(0,10)){g.beginPath();g.moveTo(Xp(z),pad.t);g.lineTo(Xp(z),h-pad.b);g.stroke();}
+  g.setLineDash([]);
+  const col=specMode==="real"?css("--accent"):css("--prime");
+  g.beginPath();g.moveTo(Xp(t[0]),Yp(0));for(let i=0;i<t.length;i++)g.lineTo(Xp(t[i]),Yp(A[i]));g.lineTo(Xp(t[t.length-1]),Yp(0));g.closePath();
+  g.fillStyle=specMode==="real"?css("--accent-soft"):css("--prime-soft");g.fill();
+  g.beginPath();for(let i=0;i<t.length;i++){i?g.lineTo(Xp(t[i]),Yp(A[i])):g.moveTo(Xp(t[i]),Yp(A[i]));}g.strokeStyle=col;g.lineWidth=1.6*d;g.stroke();
+  for(const v of [10,20,30,40,50])txt(g,String(v),Xp(v),h-pad.b+6*d,d,"center","top");
+  if(specMode==="real") Z.slice(0,4).forEach(z=>txt(g,z.toFixed(2),Xp(z)+3*d,pad.t+4*d,d,"left","top",css("--ink"),10));
+  $("r4").innerHTML=specMode==="real"?"Peaks land on the zeros.":"No peaks at the zeros: only noise.";
+}
+$("sp-real").addEventListener("click",()=>{specMode="real";$("sp-real").classList.add("on");$("sp-rand").classList.remove("on");draw4();});
+$("sp-rand").addEventListener("click",()=>{specMode="random";$("sp-rand").classList.add("on");$("sp-real").classList.remove("on");draw4();});
+
+const W_U=[],W_F=[]; DATA.wobble.u.forEach((v,i)=>{if(v>=6*Math.LN10){W_U.push(v);W_F.push(DATA.wobble.f[i]);}});
+function modes(u,K){let s=0;for(let k=0;k<K;k++){const gk=Z[k],den=2.25+gk*gk;s+=-4*(1.5*Math.cos(gk*u)+gk*Math.sin(gk*u))/den;}return s;}
+function draw4b(){
+  const K=+$("k4").value;
+  const {g,w,h,d}=setup($("cv4b")); const pad={l:40*d,r:12*d,t:12*d,b:30*d};
+  const m=W_U.map(u=>modes(u,K)); let off=0; for(let i=0;i<m.length;i++) off+=W_F[i]-m[i]; off/=m.length;
+  let sx=0,sy=0,sxx=0,syy=0,sxy=0; const N=m.length;
+  for(let i=0;i<N;i++){const a=W_F[i],b=m[i];sx+=a;sy+=b;sxx+=a*a;syy+=b*b;sxy+=a*b;}
+  const r=(N*sxy-sx*sy)/Math.sqrt((N*sxx-sx*sx)*(N*syy-sy*sy));
+  $("k4v").innerHTML=`<b>${K}</b> · match (correlation) <b>${r.toFixed(2)}</b>`;
+  const u0=W_U[0],u1=W_U[W_U.length-1];
+  const Xp=v=>pad.l+(v-u0)/(u1-u0)*(w-pad.l-pad.r), Yp=v=>pad.t+(h-pad.t-pad.b)*(0.85-v)/(0.85+2.35);
+  axes(g,w,h,d,pad);
+  for(const v of [0,-1,-2]){g.strokeStyle=css("--line");g.lineWidth=d;g.beginPath();g.moveTo(pad.l,Yp(v));g.lineTo(w-pad.r,Yp(v));g.stroke();txt(g,String(v),pad.l-6*d,Yp(v),d,"right","middle");}
+  g.strokeStyle=css("--muted");g.globalAlpha=.6;g.lineWidth=d;g.beginPath();W_U.forEach((u,i)=>{i?g.lineTo(Xp(u),Yp(W_F[i])):g.moveTo(Xp(u),Yp(W_F[i]));});g.stroke();g.globalAlpha=1;
+  g.strokeStyle=css("--accent");g.lineWidth=1.5*d;g.beginPath();W_U.forEach((u,i)=>{i?g.lineTo(Xp(u),Yp(m[i]+off)):g.moveTo(Xp(u),Yp(m[i]+off));});g.stroke();
+  for(let e=6;e<=8;e++) txt(g,"10"+["⁶","⁷","⁸"][e-6],Xp(e*Math.LN10),h-pad.b+6*d,d,"center","top");
+}
+$("k4").addEventListener("input",draw4b);
+
+/* ---------- step 5: a zero off the line ---------- */
+function draw5(){
+  const beta=+$("b5").value; $("b5v").innerHTML=`real part <b>${beta.toFixed(3)}</b>`+(beta>0.5005?" · <b>off</b> the line":" · on the line");
+  const {g,w,h,d}=setup($("cv5")); const pad={l:40*d,r:12*d,t:12*d,b:30*d};
+  const u0=3*Math.LN10,u1=40*Math.LN10,NP=1600; const us=[],fs=[]; let lo=-2.5,hi=1;
+  for(let i=0;i<NP;i++){const u=u0+(u1-u0)*i/(NP-1);let v=modes(u,138)-0.75;
+    if(beta>0.5){const gk=Z[0],den=2.25+gk*gk,base=-4*(1.5*Math.cos(gk*u)+gk*Math.sin(gk*u))/den;v+=base*(Math.exp((beta-0.5)*u)-1);}
+    us.push(u);fs.push(v);}
+  const lim=Math.max(3,...fs.map(Math.abs));
+  const Xp=v=>pad.l+(v-u0)/(u1-u0)*(w-pad.l-pad.r), Yp=v=>pad.t+(h-pad.t-pad.b)*(lim-v)/(2*lim);
+  axes(g,w,h,d,pad);
+  g.fillStyle=css("--accent-soft");g.fillRect(pad.l,Yp(1),w-pad.l-pad.r,Yp(-2.5)-Yp(1));
+  txt(g,"band the primes stay in",pad.l+6*d,Yp(1)+4*d,d,"left","top",css("--accent"),10);
+  txt(g,lim.toFixed(0),pad.l-6*d,Yp(lim),d,"right","top");txt(g,"0",pad.l-6*d,Yp(0),d,"right","middle");txt(g,(-lim).toFixed(0),pad.l-6*d,Yp(-lim),d,"right","bottom");
+  g.strokeStyle=beta>0.5005?css("--prime"):css("--accent");g.lineWidth=1.1*d;g.beginPath();us.forEach((u,i)=>{i?g.lineTo(Xp(u),Yp(fs[i])):g.moveTo(Xp(u),Yp(fs[i]));});g.stroke();
+  for(const e of [3,10,20,30,40]) txt(g,"10^"+e,Xp(e*Math.LN10),h-pad.b+6*d,d,e===3?"left":e===40?"right":"center","top");
+}
+$("b5").addEventListener("input",draw5);
+
+/* ---------- render all ---------- */
+function all(){draw1();draw2();draw3();draw3b();draw4();draw4b();draw5();}
+let rq=0; addEventListener("resize",()=>{if(!rq)rq=requestAnimationFrame(()=>{rq=0;all();});});
+if(matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change",all);
+new MutationObserver(all).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+all();
+})();
+</script>
+</body>
+</html>
