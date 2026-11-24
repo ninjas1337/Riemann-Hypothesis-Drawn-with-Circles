@@ -21,7 +21,7 @@ Draw a circle of radius 3 standing on a line. Next to it, a circle of radius 5, 
 
 ## Mathematical background
 
-The construction is new as a picture; the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to
+The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to
 
     xₙ = 2·li(pₙ²) − pₙ + O(pₙ^(3/2+ε))   for every ε > 0.
 
