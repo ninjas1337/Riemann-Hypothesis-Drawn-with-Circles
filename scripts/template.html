@@ -100,7 +100,7 @@ a{color:var(--accent)}
 <section aria-labelledby="s1">
   <div class="step">STEP 1 · THE CIRCLES</div>
   <h2 id="s1">One circle for every prime</h2>
-  <p>Prime numbers are the whole numbers greater than 1 that can only be divided evenly by 1 and by themselves: 2, 3, 5, 7, 11, 13, … Start at 3. Draw a circle of radius 3 standing on a line. Next to it, a circle of radius 5, placed so the two just touch. Then 7, then 11, and so on: one circle for every prime, each touching the one before.</p>
+  <p>Prime numbers are the whole numbers greater than 1 that can only be divided evenly by 1 and by themselves: 2, 3, 5, 7, 11, 13, … Start at 2. Draw a circle of radius 2 standing on a line. Next to it, a circle of radius 3, placed so the two just touch. Then 5, then 7, then 11, and so on: one circle for every prime, each touching the one before.</p>
   <div class="panel">
     <canvas id="cv1" class="c-circ" role="img" aria-label="Circles of prime radius standing on a line, each touching the next"></canvas>
     <div class="controls">
@@ -110,7 +110,7 @@ a{color:var(--accent)}
     <p class="readout" id="r1"></p>
   </div>
   <p>Notice what sets each position: every circle is pushed along by all the circles before it. The exact step between neighbouring circles of radius p and q is 2√(pq), which is very close to p + q because neighbouring primes are close compared with their size. So a centre's distance along the line behaves like twice the running total of all the primes so far, not like the width of one circle. That running total is what we will follow.</p>
-  <p>Mark the centre of every circle. The primes jump around unpredictably, yet the centres line up surprisingly well along a smooth curve (dashed). That curve, x = 2·li(y²) − y − 3, comes from the <b>prime number theorem</b> from 1896 applied to the running total of the primes (li is the logarithmic integral, a standard smooth function). The dots never sit exactly on it, though. That tiny mismatch is what the whole story is about.</p>
+  <p>Mark the centre of every circle. The primes jump around unpredictably, yet the centres line up surprisingly well along a smooth curve (dashed). That curve, x = 2·li(y²) − y − 2, comes from the <b>prime number theorem</b> from 1896 applied to the running total of the primes (li is the logarithmic integral, a standard smooth function). The dots never sit exactly on it, though. That tiny mismatch is what the whole story is about.</p>
 </section>
 
 <!-- STEP 2 -->
@@ -226,11 +226,11 @@ a{color:var(--accent)}
   <h2 id="s8">What exactly is computed</h2>
   <p>This page makes no new theorem and no new proof. It is a geometric encoding of known prime-sum mathematics that makes the role of the zeta zeros visible.</p>
   <div class="formula" style="white-space:normal">
-  Circles: radius p for every prime p ≥ 3, standing on one line, each touching the next. Touching gives a horizontal step 2√(pₖpₖ₊₁), so<br>
-  xₙ = Σ 2√(pₖpₖ₊₁) = 2·Σ<sub>p≤pₙ</sub> p − pₙ − 3 − Cₙ, &nbsp; with Cₙ = Σ(√pₖ₊₁ − √pₖ)².<br>
+  Circles: radius p for every prime p, starting at 2, standing on one line, each touching the next. Touching gives a horizontal step 2√(pₖpₖ₊₁), so<br>
+  xₙ = Σ 2√(pₖpₖ₊₁) = 2·Σ<sub>p≤pₙ</sub> p − pₙ − 2 − Cₙ, &nbsp; with Cₙ = Σ(√pₖ₊₁ − √pₖ)².<br>
   Since (√q − √p)² ≤ q − p, the tangency correction satisfies 0 ≤ Cₙ ≤ pₙ.<br><br>
-  Smooth curve: 2·li(y²) − y − 3, from Σ<sub>p≤y</sub> p ∼ li(y²).<br>
-  Wobble: E(y) = x − (2·li(y²) − y − 3) = 2·(Σ<sub>p≤y</sub> p − li(y²)) + O(y).<br><br>
+  Smooth curve: 2·li(y²) − y − 2, from Σ<sub>p≤y</sub> p ∼ li(y²).<br>
+  Wobble: E(y) = x − (2·li(y²) − y − 2) = 2·(Σ<sub>p≤y</sub> p − li(y²)) + O(y).<br><br>
   RH ⟺ π(y) = li(y) + O(y<sup>1/2+ε</sup>) (von Koch). Partial summation turns this into Σ<sub>p≤y</sub> p = li(y²) + O(y<sup>3/2+ε</sup>) and back again. The O(y) tangency term is far smaller, so<br>
   RH ⟺ E(y) = O(y<sup>3/2+ε</sup>) for every ε &gt; 0.<br><br>
   Waves: by the explicit formula, a zero ρ = β + iγ adds a term of size y<sup>1+β</sup>, oscillating like cos(γ·ln y + φ). Scaled by y<sup>3/2</sup>/ln y, its amplitude goes like y<sup>β−1/2</sup>: constant on the critical line. The wheels in step 4 use the amplitude 4/|ρ + 1| predicted for β = ½.
@@ -239,7 +239,7 @@ a{color:var(--accent)}
 </section>
 
 <footer>
-  <p>Concept and construction: Sanjin Redzic. Numerics computed for every prime up to 10⁸; zeros from Odlyzko's tables and a Riemann–Siegel computation. Source code and data: <a href="https://github.com/ninjas1337/Riemann-Hypothesis-Drawn-with-Circles">GitHub</a>. Part of the <a href="https://github.com/ninjas1337/Prime-Helix">Prime Helix</a> project.</p>
+  <p>Concept and construction: Sanjin Redzic. Numerics computed for every prime up to 10⁸; zeros computed with the Riemann–Siegel and Euler–Maclaurin formulas and checked against Odlyzko's tables. Source code and data: <a href="https://github.com/ninjas1337/Riemann-Hypothesis-Drawn-with-Circles">GitHub</a>. Part of the <a href="https://github.com/ninjas1337/Prime-Helix">Prime Helix</a> project.</p>
   <ol>
     <li>B. Riemann, Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse, <i>Monatsber. Berliner Akad.</i>, 1859.</li>
     <li>H. von Koch, Sur la distribution des nombres premiers, <i>Acta Math.</i> 24 (1901), 159–182.</li>
@@ -266,9 +266,9 @@ const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)
 /* ---------- maths ---------- */
 function li(x){const L=Math.log(x);let a=L,inner=1,s=a;for(let n=2;n<400;n++){a*=-L/(2*n);if(n%2===1)inner+=1/n;const t=a*inner;s+=t;if(Math.abs(t)<1e-17*Math.abs(s)&&n>L)break;}return 0.5772156649015329+Math.log(L)+Math.sqrt(x)*s;}
 const PMAX=100000, sv=new Uint8Array(PMAX+1), P=[];
-for(let i=2;i<=PMAX;i++){ if(!sv[i]){ if(i>=3) P.push(i); if(i*i<=PMAX) for(let j=i*i;j<=PMAX;j+=i) sv[j]=1; } }
+for(let i=2;i<=PMAX;i++){ if(!sv[i]){ P.push(i); if(i*i<=PMAX) for(let j=i*i;j<=PMAX;j+=i) sv[j]=1; } }
 const X=new Float64Array(P.length); for(let k=1;k<P.length;k++) X[k]=X[k-1]+2*Math.sqrt(P[k-1]*P[k]);
-const smooth = y => 2*li(y*y)-y-3;
+const smooth = y => 2*li(y*y)-y-2;
 const Z = DATA.zeros;
 
 /* ---------- canvas helper ---------- */
@@ -293,7 +293,7 @@ function draw1(){
     if(P[k]*sc>9*d) txt(g,String(P[k]),Xp(X[k]),Yp(P[k])-6*d,d,"center","bottom",css("--ink"),Math.min(13,Math.max(9,P[k]*sc/(2.6*d))));
   }
   if(showCurve){g.strokeStyle=css("--prime");g.setLineDash([5*d,4*d]);g.lineWidth=1.3*d;g.beginPath();
-    for(let i=0;i<=200;i++){const y=3+(P[n-1]*1.05-3)*i/200;const x=smooth(y);i?g.lineTo(Xp(x),Yp(y)):g.moveTo(Xp(x),Yp(y));}
+    for(let i=0;i<=200;i++){const y=2+(P[n-1]*1.05-2)*i/200;const x=smooth(y);i?g.lineTo(Xp(x),Yp(y)):g.moveTo(Xp(x),Yp(y));}
     g.stroke();g.setLineDash([]);}
   const k=n-1;
   $("r1").innerHTML=`Last circle: radius <b>${P[k]}</b>, centre at <b>${X[k].toFixed(1)}</b> along and <b>${P[k]}</b> up. The smooth curve predicts <b>${smooth(P[k]).toFixed(1)}</b> along. For small circles the curve is still rough; it fits better and better as the circles grow.`;
@@ -331,13 +331,13 @@ function draw3(){
   const {g,w,h,d}=setup($("cv3")); const pad={l:58*d,r:12*d,t:14*d,b:30*d};
   let n=0; while(n<P.length&&P[n]<=lim) n++;
   const E=new Float64Array(n); let mx=1e-9; for(let k=0;k<n;k++){E[k]=X[k]-smooth(P[k]); mx=Math.max(mx,Math.abs(E[k]));}
-  const Xp=p=>pad.l+(p-3)/(lim-3)*(w-pad.l-pad.r), Yp=v=>pad.t+(h-pad.t-pad.b)*(0.5-v/(2*mx*1.08));
+  const Xp=p=>pad.l+(p-2)/(lim-2)*(w-pad.l-pad.r), Yp=v=>pad.t+(h-pad.t-pad.b)*(0.5-v/(2*mx*1.08));
   axes(g,w,h,d,pad);
   g.strokeStyle=css("--muted");g.lineWidth=d;g.beginPath();g.moveTo(pad.l,Yp(0));g.lineTo(w-pad.r,Yp(0));g.stroke();
   txt(g,"curve",pad.l+4*d,Yp(0)-4*d,d,"left","bottom");
   for(let k=0;k<n;k++){g.fillStyle=E[k]>0?css("--prime"):css("--accent");const x=Xp(P[k]);g.fillRect(x-(n<200?1.5:0.6)*d,Math.min(Yp(0),Yp(E[k])),(n<200?3:1.2)*d,Math.abs(Yp(E[k])-Yp(0))||d);}
   txt(g,"ahead",pad.l-6*d,pad.t+8*d,d,"right","top");txt(g,"behind",pad.l-6*d,h-pad.b-8*d,d,"right","bottom");
-  const st=nice(lim/5); for(let v=0;v<=lim*1.0001;v+=st){const vv=Math.max(v,3);txt(g,Math.round(v).toLocaleString("en"),Xp(vv),h-pad.b+6*d,d,v===0?"left":(v+st>lim*1.0001?"right":"center"),"top");}
+  const st=nice(lim/5); for(let v=0;v<=lim*1.0001;v+=st){const vv=Math.max(v,2);txt(g,Math.round(v).toLocaleString("en"),Xp(vv),h-pad.b+6*d,d,v===0?"left":(v+st>lim*1.0001?"right":"center"),"top");}
   if(lim<3000){const k=P.indexOf(109);if(k>=0){g.strokeStyle=css("--prime");g.lineWidth=d;g.beginPath();g.moveTo(Xp(111),Yp(0)-3*d);g.lineTo(Xp(111)+18*d,pad.t+22*d);g.stroke();txt(g,"first crossing: 109 and 113",Xp(111)+20*d,pad.t+22*d,d,"left","middle",css("--prime"),11);}}
 }
 $("n3").addEventListener("input",draw3);

@@ -8,7 +8,7 @@
 
 ## The idea in one paragraph
 
-Draw a circle of radius 3 standing on a line. Next to it, a circle of radius 5, just touching. Then 7, 11, 13, and so on: one circle for every prime. The centres follow a smooth curve predicted by the prime number theorem, but never exactly; they wobble. Split that wobble into its frequencies and out come 14.13, 21.02, 25.01, 30.42 … the zeros of the Riemann zeta function. Replace the primes with random numbers and the zeros vanish. The Riemann Hypothesis says the wobble never grows beyond a certain size, no matter how far you go.
+Draw a circle of radius 2 standing on a line. Next to it, a circle of radius 3, just touching. Then 5, 7, 11, and so on: one circle for every prime. The centres follow a smooth curve predicted by the prime number theorem, but never exactly; they wobble. Split that wobble into its frequencies and out come 14.13, 21.02, 25.01, 30.42 … the zeros of the Riemann zeta function. Replace the primes with random numbers and the zeros vanish. The Riemann Hypothesis says the wobble never grows beyond a certain size, no matter how far you go.
 
 ## What the page covers
 

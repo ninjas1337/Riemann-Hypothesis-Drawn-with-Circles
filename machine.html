@@ -98,7 +98,7 @@ a{color:var(--smooth)}
   <div class="read">
     <div class="cell"><div class="k">Current prime y</div><div class="v" id="r-y">–</div></div>
     <div class="cell"><div class="k">Prime shaft (chain position)</div><div class="v" id="r-x">–</div></div>
-    <div class="cell"><div class="k">Smooth shaft 2·li(y²) − y − 3</div><div class="v" id="r-s">–</div></div>
+    <div class="cell"><div class="k">Smooth shaft 2·li(y²) − y − 2</div><div class="v" id="r-s">–</div></div>
     <div class="cell"><div class="k">Controller output</div><div class="v" id="r-c">–</div></div>
     <div class="cell"><div class="k">Slip <span class="chip" id="r-chip">–</span></div><div class="v" id="r-slip">–</div></div>
   </div>
@@ -121,7 +121,7 @@ a{color:var(--smooth)}
   <div class="parts">
     <div class="part"><h3 style="color:var(--brass)">1 · Sieve gears</h3><p>Gears with 2, 3, 5, 7, 11 and 13 teeth turn one tooth per number. A gear blocks the light beam when its mark points up, which happens when the number is divisible by its tooth count. When all marks are away, the beam passes. (Six gears certify primes up to 168; beyond that the machine reads the primes from a table.)</p></div>
     <div class="part"><h3 style="color:var(--prime)">2 · Prime shaft</h3><p>A ratchet advances one tooth per prime and moves the shaft forward by 2√(p·q), the step to the next touching circle. Its position is the circle chain from the explainer.</p></div>
-    <div class="part"><h3 style="color:var(--smooth)">3 · Smooth shaft</h3><p>A cam cut to the curve 2·li(y²) − y − 3 turns continuously: the prime number theorem as a piece of metal.</p></div>
+    <div class="part"><h3 style="color:var(--smooth)">3 · Smooth shaft</h3><p>A cam cut to the curve 2·li(y²) − y − 2 turns continuously: the prime number theorem as a piece of metal.</p></div>
     <div class="part"><h3 style="color:var(--ctrl)">4 · Controller</h3><p>Wheels on wheels, one per zeta zero. Wheel k turns at speed γ<sub>k</sub> in log-time ln y, with size 4/|ρ<sub>k</sub> + 1|. Its shadow is the control signal. This is in spirit the machine Alan Turing began to cut in brass in 1939.</p></div>
     <div class="part"><h3 style="color:var(--ink)">5 · Differential</h3><p>Like the differential in a car axle, it outputs the difference between the prime shaft and the smooth shaft plus controller. The needle shows the slip.</p></div>
   </div>
@@ -156,13 +156,13 @@ const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").m
 
 /* ---------- primes and the circle chain ---------- */
 const NMAX=5000000, sv=new Uint8Array(NMAX+1); const PR=[];
-for(let i=2;i<=NMAX;i++){ if(!sv[i]){ if(i>=3) PR.push(i); if(i*i<=NMAX) for(let j=i*i;j<=NMAX;j+=i) sv[j]=1; } }
+for(let i=2;i<=NMAX;i++){ if(!sv[i]){ PR.push(i); if(i*i<=NMAX) for(let j=i*i;j<=NMAX;j+=i) sv[j]=1; } }
 const NP=PR.length, P=Float64Array.from(PR), X=new Float64Array(NP);
 for(let k=1;k<NP;k++) X[k]=X[k-1]+2*Math.sqrt(P[k-1]*P[k]);
 const isPrime=n=>n>=2&&n<=NMAX&&!sv[n];
 function idx(y){let lo=0,hi=NP-1;if(y<P[0])return 0;while(lo<hi){const m=(lo+hi+1)>>1;if(P[m]<=y)lo=m;else hi=m-1;}return lo;}
 function li(x){const L=Math.log(x);let a=L,inner=1,s=a;for(let n=2;n<400;n++){a*=-L/(2*n);if(n%2===1)inner+=1/n;const t=a*inner;s+=t;if(Math.abs(t)<1e-17*Math.abs(s)&&n>L)break;}return 0.5772156649015329+Math.log(L)+Math.sqrt(x)*s;}
-const smooth=y=>2*li(y*y)-y-3;
+const smooth=y=>2*li(y*y)-y-2;
 const scale=y=>Math.pow(y,1.5)/Math.log(y);
 
 /* ---------- state ---------- */
@@ -220,7 +220,7 @@ function drawMachine(){
   g.beginPath(); g.moveTo(cx,cy+fr-1*d); g.lineTo(cx,cy+fr-U*0.5); g.stroke();
   g.beginPath(); g.arc(cx,cy+fr-1*d,3*d,0,2*Math.PI); g.fillStyle=C.smooth; g.fill();
   label(g,"SMOOTH SHAFT",cx,cy+cr+U*0.45,C.smooth,fs,"center");
-  label(g,"cam: 2·li(y²) − y − 3",cx,cy+cr+U*0.85,C.muted,fs*0.85,"center");
+  label(g,"cam: 2·li(y²) − y − 2",cx,cy+cr+U*0.85,C.muted,fs*0.85,"center");
   // --- 4. controller (epicycles of the zeros)
   const ex=U*9.2, ey=U*5.0, nShow=Math.min(K,10);
   label(g,"CONTROLLER",ex,U*0.55,C.ctrl,fs,"center");

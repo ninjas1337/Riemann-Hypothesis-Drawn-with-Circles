@@ -6,9 +6,9 @@ Needs numpy and scipy. Sieves all primes up to 10^8 (about 100 MB of memory, a f
 
 What it computes
   1. Zeros of the Riemann zeta function up to height 300 (Riemann-Siegel to bracket, Euler-Maclaurin to refine).
-  2. The circle chain: circles of radius p (every prime p >= 3) standing on a line, each
+  2. The circle chain: circles of radius p (every prime, starting at 2) standing on a line, each
      touching the next, so consecutive centres are 2*sqrt(p*q) apart horizontally.
-  3. The wobble: centre position minus the smooth curve 2*li(y^2) - y - 3, scaled by y^1.5/ln y.
+  3. The wobble: centre position minus the smooth curve 2*li(y^2) - y - 2, scaled by y^1.5/ln y.
   4. The spectrum of the wobble in ln y, for real primes and for Cramer's random model.
 """
 import json, os
@@ -55,9 +55,9 @@ def sieve(X):
     return np.nonzero(s)[0].astype(float)
 def wobble(p):
     x = np.concatenate([[0], np.cumsum(2*np.sqrt(p[:-1]*p[1:]))])
-    E = x - (2*li(p**2) - p - 3)
+    E = x - (2*li(p**2) - p - p[0])   # p[0] = 2, the first circle
     return np.log(p), E/(p**1.5/np.log(p))
-p8 = sieve(10**8); p8 = p8[p8 >= 3]
+p8 = sieve(10**8)                       # the chain starts at 2
 u, f = wobble(p8)
 ug = np.linspace(np.log(1e3), u[-1], 3000); fg = np.interp(ug, u, f)
 
@@ -69,7 +69,7 @@ def spectrum(p):
     gam = np.arange(5, 52.01, 0.05)
     return gam, np.array([abs(np.sum(w*y*np.exp(-1j*g*g2)))*du for g in gam])
 p7 = p8[p8 <= 10**7]
-rng = np.random.default_rng(7); n = np.arange(3, 10**7+1)
+rng = np.random.default_rng(7); n = np.arange(2, 10**7+1)
 cram = n[rng.random(len(n)) < 1/np.log(n.astype(float))].astype(float)
 gam, Ar = spectrum(p7); _, Ac = spectrum(cram)
 
