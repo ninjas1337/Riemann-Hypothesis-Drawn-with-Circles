@@ -25,6 +25,10 @@ The construction is as far as I know new as a picture; but the mathematics behin
 
     xₙ = 2·li(pₙ²) − pₙ + O(pₙ^(3/2+ε))   for every ε > 0.
 
+Precisely: touching circles give the step 2√(pₖpₖ₊₁), so xₙ = 2·Σ_{p≤pₙ} p − pₙ − 3 − Cₙ with Cₙ = Σ(√pₖ₊₁ − √pₖ)². Since (√q − √p)² ≤ q − p, the tangency correction satisfies 0 ≤ Cₙ ≤ pₙ, far below the y^(3/2) scale. Von Koch's criterion π(y) = li(y) + O(y^(1/2+ε)) transfers to Σ_{p≤y} p = li(y²) + O(y^(3/2+ε)) and back by partial summation, which gives the statement above.
+
+The spectrum on the page is computed from the scaled wobble E/(y^1.5/ln y), resampled on an even grid in ln y (the zeros act as frequencies in ln y, not in y), with a Hann window and a direct Fourier transform. This is a geometric encoding of known prime-sum mathematics, not a new theorem or proof.
+
 ## Reproduce the numbers
 
 ```
@@ -44,6 +48,7 @@ Related: [Complex numbers are not imaginary](https://ninjas1337.github.io/Imagin
 - H. von Koch, *Sur la distribution des nombres premiers*, Acta Math. 24 (1901), 159–182.
 - H. Davenport, *Multiplicative Number Theory*, 3rd ed., Springer GTM 74, 2000, ch. 17–18.
 - J. E. Littlewood, *Sur la distribution des nombres premiers*, C. R. Acad. Sci. Paris 158 (1914), 1869–1872.
+- D. Platt & T. Trudgian, *The Riemann hypothesis is true up to 3·10¹²*, Bull. London Math. Soc. 53 (2021), 792–797.
 - H. Cramér, *On the order of magnitude of the difference between consecutive prime numbers*, Acta Arith. 2 (1936), 23–46.
 - A. M. Odlyzko, *Tables of zeros of the Riemann zeta function*.
 
