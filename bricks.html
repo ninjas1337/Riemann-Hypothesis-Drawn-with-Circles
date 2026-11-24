@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numbers Built from Bricks</title>
+<meta name="description" content="Every number assembled from toy bricks: a prime is a single 1×p brick, a composite is built by copying, one copy step per prime factor. 12 = a 1×2 brick, copied into a 2×2 plate, stacked into a 2×2×3 block.">
+<meta property="og:title" content="Numbers Built from Bricks">
+<meta property="og:description" content="Primes are single bricks; every other number is assembled by copying.">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Blueprint theme shared with the companion pages; the bricks themselves use bright toy colours. One column: the 3D build with its controls and step readout, then the explanation. */
+  --bp:#0f2a47; --deep:#0b2039; --ink:#e8eef5; --muted:#9fb3c8; --grid:#1f4268;
+  --brass:#d9a441; --line:#7fc4e8; --zeta:#a7e3a1; --hot:#f08a4b;
+  --font-display:"Source Serif 4", Georgia, serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--deep);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:24px}
+.back{font-size:.9rem;color:var(--line)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:4px 0 8px;text-wrap:balance}
+h1 em{color:var(--hot);font-weight:400}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0;text-wrap:balance}
+p{margin:0;max-width:70ch}
+.lede{color:var(--muted);font-size:1.06rem}
+section{display:grid;gap:12px}
+.sheet{background:var(--bp);border:1px solid var(--grid);border-radius:10px;padding:12px;display:grid;gap:10px}
+canvas{display:block;width:100%;aspect-ratio:1.35/1;border-radius:6px;background:#0a1d33}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:.9rem}
+.row label{display:flex;gap:8px;align-items:center}
+input[type=number]{font:inherit;font-size:1rem;width:6em;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:4px 8px}
+input[type=range]{accent-color:var(--brass);width:min(150px,100%)}
+button{font:inherit;font-size:.86rem;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button.on{background:var(--brass);border-color:var(--brass);color:var(--deep);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.big{font-family:var(--font-display);font-size:1.5rem}
+.read{font-family:var(--font-mono);font-size:.86rem;color:var(--muted);white-space:pre-wrap}
+.callout{border-left:4px solid var(--hot);background:var(--bp);padding:12px 16px;border-radius:0 8px 8px 0;max-width:70ch}
+footer{border-top:1px solid var(--grid);padding-top:16px;font-size:.85rem;color:var(--muted);display:grid;gap:8px}
+footer ol{margin:0;padding-left:20px;display:grid;gap:4px}
+a{color:var(--line)}
+</style>
+</head>
+<body>
+<main>
+<div>
+  <a class="back" href="line.html">← The factorisation line</a>
+  <h1>Numbers built from bricks, <em>primes as single bricks</em></h1>
+  <p class="lede">Think of every number as unit studs clicked together. A prime can only be one long brick, 1×p: there is no way to build it from identical copies of a smaller brick. Every other number is assembled by copying, one copy step for each prime factor. Whatever order you copy in, you end up with the same block.</p>
+</div>
+
+<section>
+  <div class="sheet">
+    <div class="row">
+      <button id="minus" type="button" aria-label="Previous number">−</button>
+      <label for="n" class="big">n = <input id="n" type="number" min="2" max="1000" value="12"></label>
+      <button id="plus" type="button" aria-label="Next number">+</button>
+      <button id="nextP" type="button">Next prime</button>
+      <button id="nextC" type="button">Next composite</button>
+      <button id="rich" type="button">Rich number</button>
+    </div>
+    <canvas id="cv" role="img" aria-label="The chosen number assembled from bricks in three dimensions"></canvas>
+    <div class="row">
+      <button id="play" class="on" type="button">Assemble</button>
+      <button id="whole" type="button">Show finished block</button>
+      <label for="speed">Speed <input id="speed" type="range" min="1" max="20" value="6"></label>
+    </div>
+    <p class="read" id="read"></p>
+  </div>
+</section>
+
+<section>
+  <h2>How the building works</h2>
+  <p>Write the number as a product of primes, smallest first: 12 = 2 · 2 · 3. Start with one brick of length 2. Copy it 2 times side by side: a 2×2 plate. Stack 3 of those plates: a 2×2×3 block of twelve studs. Each prime factor is one copying step, in its own direction.</p>
+  <p>After three steps every direction is used, so a fourth factor copies the whole block side by side with a small gap, like a module repeated in a building set; a fifth repeats that row of modules, and so on. The number of copying steps is the number of prime factors counted with repetition, the number of directions the number can unfold into.</p>
+  <div class="callout"><p>A prime is the brick that cannot be built from copies. Every other number has exactly one finished block with prime edges: that is the fundamental theorem of arithmetic, in plastic.</p></div>
+  <p>Order does not matter for the finished shape: copying 3 times and then 2 times gives the same block as 2 and then 3, just turned. Try the rich numbers like 360 = 2·2·2·3·3·5 or 720, with six or seven copy steps, against a prime like 359 next to them, which stays a single brick.</p>
+</section>
+
+<footer>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a> · <a href="line.html">The factorisation line</a>. Bricks are drawn as unit cubes in isometric view; colours mark the copies of the first brick.</p>
+  <ol>
+    <li>Euclid, <i>Elements</i>, Book VII, Props. 30–32, and Book IX, Prop. 14.</li>
+    <li>C. F. Gauss, <i>Disquisitiones Arithmeticae</i>, 1801, art. 16 (uniqueness of prime factorisation).</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const PAL=["#d6382c","#2f6fd0","#f2c94c","#2e9a55","#f08a2b","#e8e8e8","#8e5bd6","#22b3c4"];
+function isPrime(n){if(n<2)return false;for(let q=2;q*q<=n;q++) if(n%q===0) return false;return true;}
+function factor(n){const f=[];let m=n;for(let p=2;p*p<=m;p++){while(m%p===0){f.push(p);m/=p;}}if(m>1)f.push(m);return f;}
+function shade(hex,k){const v=parseInt(hex.slice(1),16);let r=(v>>16)&255,g=(v>>8)&255,b=v&255;r=Math.round(r*k);g=Math.round(g*k);b=Math.round(b*k);return "rgb("+Math.min(255,r)+","+Math.min(255,g)+","+Math.min(255,b)+")";}
+
+let N=12, F=[2,2,3], stepK=0, copyT=1, playing=!reduce, acc=0, showAll=false, layout=null;
+
+function buildLayout(){ // strides per factor: axis = k mod 3, gap grows with the level of repetition
+  const ext=[1,1,1], strides=[], axes=[];
+  F.forEach((p,k)=>{ const a=k%3, L=Math.floor(k/3), gap=L; strides.push(ext[a]+gap); axes.push(a); ext[a]=p*ext[a]+(p-1)*gap; });
+  layout={strides,axes,ext};
+}
+function cubes(kMax,tMax){ // unit cubes present when step kMax has placed tMax copies
+  const out=[]; const K=F.length; const d=new Array(K).fill(0);
+  const lim=F.map((p,k)=>k<kMax?p:(k===kMax?tMax:1));
+  (function rec(k){
+    if(k===K){ const c=[0,0,0]; let brick=0, mult=1;
+      for(let j=0;j<K;j++){ c[layout.axes[j]]+=d[j]*layout.strides[j]; if(j>0){ brick+=d[j]*mult; mult*=F[j]; } }
+      out.push({x:c[0],y:c[1],z:c[2],col:PAL[brick%PAL.length]}); return; }
+    for(let i=0;i<lim[k];i++){ d[k]=i; rec(k+1); } d[k]=0;
+  })(0);
+  return out;
+}
+function fit(c){const r=c.getBoundingClientRect(),dp=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*dp)),h=Math.max(1,Math.round(r.height*dp));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d:dp};}
+
+function draw(){
+  const {g,w:W,h:H,d}=fit($("cv"));
+  const K=F.length, kMax=showAll?K-1:stepK, tMax=showAll?F[K-1]:copyT;
+  const cs=cubes(kMax,tMax);
+  // isometric projection, fitted to the finished block so the camera does not jump
+  const CO=Math.cos(Math.PI/6), SI=0.5, HZ=1.0;
+  const P=(x,y,z)=>[(x-y)*CO,(x+y)*SI-z*HZ];
+  const E=layout.ext; let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+  for(const [x,y,z] of [[0,0,0],[E[0],0,0],[0,E[1],0],[E[0],E[1],0],[0,0,E[2]],[E[0],0,E[2]],[0,E[1],E[2]],[E[0],E[1],E[2]]]){ const [u,v]=P(x,y,z); minX=Math.min(minX,u);maxX=Math.max(maxX,u);minY=Math.min(minY,v-0.3);maxY=Math.max(maxY,v); }
+  const s=Math.min(W*0.86/(maxX-minX), H*0.82/(maxY-minY)), ox=W/2-(minX+maxX)/2*s, oy=H/2-(minY+maxY)/2*s;
+  const S=(x,y,z)=>{const [u,v]=P(x,y,z);return [ox+u*s,oy+v*s];};
+  // ground shadow of the finished block
+  g.fillStyle="rgba(0,0,0,0.25)"; g.beginPath(); for(const [x,y] of [[0,0],[E[0],0],[E[0],E[1]],[0,E[1]]]){ const [a,b]=S(x,y,0); g.lineTo(a,b); } g.closePath(); g.fill();
+  const occ=new Set(cs.map(c=>c.x+","+c.y+","+c.z));
+  cs.sort((a,b)=>(a.x+a.y+a.z)-(b.x+b.y+b.z)||a.z-b.z);
+  const edge=Math.max(0.5,Math.min(1.4,s*0.04))*d;
+  for(const c of cs){
+    const {x,y,z,col}=c;
+    const face=(pts,fill)=>{ g.beginPath(); pts.forEach(([a,b,cc],i)=>{const [u,v]=S(a,b,cc); i?g.lineTo(u,v):g.moveTo(u,v);}); g.closePath(); g.fillStyle=fill; g.fill(); g.strokeStyle="rgba(0,0,0,0.35)"; g.lineWidth=edge; g.stroke(); };
+    face([[x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1]], shade(col,1.0));      // top
+    face([[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1],[x+1,y,z+1]], shade(col,0.72));     // +x side
+    face([[x,y+1,z],[x+1,y+1,z],[x+1,y+1,z+1],[x,y+1,z+1]], shade(col,0.55));     // +y side
+    if(!occ.has(x+","+y+","+(z+1)) && s>9){ // stud
+      const [cx,cy]=S(x+0.5,y+0.5,z+1), rx=0.3*s*CO*1.15, ry=0.3*s*SI*1.15, hh=0.18*s;
+      g.fillStyle=shade(col,0.72); g.beginPath(); g.ellipse(cx,cy,rx,ry,0,0,Math.PI); g.lineTo(cx-rx,cy-hh); g.ellipse(cx,cy-hh,rx,ry,0,Math.PI,0,true); g.closePath(); g.fill();
+      g.fillStyle=shade(col,1.08); g.beginPath(); g.ellipse(cx,cy-hh,rx,ry,0,0,2*Math.PI); g.fill(); g.strokeStyle="rgba(0,0,0,0.3)"; g.lineWidth=edge*0.8; g.stroke();
+    }
+  }
+  g.fillStyle="#9fb3c8"; g.font=(12*d)+"px "+MONO; g.fillText(cs.length+" studs",10*d,H-10*d);
+  describe(kMax,tMax);
+}
+const AX=["side by side","in rows","stacked up"];
+function describe(kMax,tMax){
+  const K=F.length;
+  if(K===1){ $("read").textContent=N+" is prime: one single 1×"+N+" brick. It cannot be built from identical copies of any smaller brick."; return; }
+  const lines=[N+" = "+F.join(" · ")+"   ("+K+" copy steps)"];
+  lines.push("Start: one 1×"+F[0]+" brick.");
+  for(let k=1;k<K;k++){
+    const lvl=Math.floor(k/3), what=k<3?(k===1?"copy it":"copy that"):"copy the whole "+(lvl===1?"block":"group");
+    const st=(k<kMax||(k===kMax&&tMax===F[k]))?"✓":(k===kMax?"…":" ");
+    lines.push(st+" "+what+" "+F[k]+" times "+AX[k%3]+(lvl>0?" (with a gap)":"")+".");
+  }
+  const fin = K===2 ? F[0]+" × "+F[1]+" plate" : K===3 ? F[0]+" × "+F[1]+" × "+F[2]+" block" : (N/(F[0]*F[1]*F[2]))+" copies of the "+F[0]+" × "+F[1]+" × "+F[2]+" block";
+  lines.push("Finished: "+fin+".");
+  $("read").textContent=lines.join("\n");
+}
+function setN(v){ N=Math.max(2,Math.min(1000,Math.round(v)||2)); $("n").value=N; F=factor(N); buildLayout(); stepK=0; copyT=1; showAll=false; acc=0; playing=!reduce; $("play").classList.toggle("on",playing); $("play").textContent=playing?"Pause":"Assemble"; if(F.length===1){ showAll=true; } draw(); }
+function tick(){
+  if(playing&&!showAll){ acc+=(+$("speed").value)/60; if(acc>=1){ acc=0;
+      if(copyT<F[stepK]) copyT++; else if(stepK<F.length-1){ stepK++; copyT=1; } else { playing=false; $("play").textContent="Assemble"; $("play").classList.remove("on"); }
+      draw(); } }
+  requestAnimationFrame(tick);
+}
+$("n").addEventListener("change",function(){setN(+this.value);});
+$("minus").addEventListener("click",()=>setN(N-1));
+$("plus").addEventListener("click",()=>setN(N+1));
+$("nextP").addEventListener("click",()=>{let m=N+1;while(!isPrime(m))m++;setN(m);});
+$("nextC").addEventListener("click",()=>{let m=N+1;while(isPrime(m))m++;setN(m);});
+const RICH=[12,24,36,48,60,72,96,120,180,240,360,720,840];
+$("rich").addEventListener("click",()=>{const i=RICH.findIndex(v=>v>N);setN(RICH[i<0?0:i]);});
+$("play").addEventListener("click",function(){ if(showAll||(stepK===F.length-1&&copyT===F[F.length-1])){ stepK=0; copyT=1; showAll=false; } playing=!playing; this.textContent=playing?"Pause":"Assemble"; this.classList.toggle("on",playing); draw(); });
+$("whole").addEventListener("click",()=>{ showAll=true; playing=false; $("play").textContent="Assemble"; $("play").classList.remove("on"); draw(); });
+window.addEventListener("resize",draw);
+setN(12); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -55,6 +55,12 @@ The numbers in order as tiles: each prime a thin 1×p strip, every other number 
 
 Every rectangle of every factorisation (both sides at least 2) laid side by side on the real line from 2×2 upwards, standing or lying; each prime is left empty, as a dashed spire 1 wide and p tall (standing) or a gap of length p (lying). Each composite shows up as a little falling staircase of its rectangles. With the rectangles lying down the empty share of the line is predicted by li(N²) − ½li(N^{3/2}) − … against an exact composite length of about (π²/6 − 1)·N²/2: roughly 1/(1 + (π²/6 − 1)·ln N), so 20% empty at 1,000 and 12% at 100,000.
 
+## Numbers Built from Bricks
+
+👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/bricks.html**
+
+Pick a number and watch it assemble in 3D from toy-style bricks: start with one 1×p brick for the smallest prime factor, then one copying step per further prime factor (side by side, in rows, stacked up, then whole blocks repeated with gaps). 12 = 2·2·3 becomes a 2×2×3 block; a prime stays one long 1×p brick, the piece that cannot be built from copies. The number of copy steps is the number of prime factors counted with repetition.
+
 ## Mathematical background
 
 The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to
