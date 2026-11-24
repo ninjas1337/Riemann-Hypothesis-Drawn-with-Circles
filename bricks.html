@@ -87,7 +87,7 @@ a{color:var(--line)}
 </section>
 
 <footer>
-  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a> · <a href="line.html">The factorisation line</a>. Bricks are drawn as unit cubes in isometric view; colours mark the copies of the first brick.</p>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a> · <a href="line.html">The factorisation line</a>. Studs are drawn as unit cubes in isometric view. Each prime has one colour: its brick in the kit, the edge of the block it sets, and the copies it makes while the block is assembled.</p>
   <ol>
     <li>Euclid, <i>Elements</i>, Book VII, Props. 30–32, and Book IX, Prop. 14.</li>
     <li>C. F. Gauss, <i>Disquisitiones Arithmeticae</i>, 1801, art. 16 (uniqueness of prime factorisation).</li>
@@ -113,13 +113,16 @@ function buildLayout(){ // strides per factor: axis = k mod 3, gap grows with th
   F.forEach((p,k)=>{ const a=k%3, L=Math.floor(k/3), gap=L; strides.push(ext[a]+gap); axes.push(a); ext[a]=p*ext[a]+(p-1)*gap; });
   layout={strides,axes,ext};
 }
-function cubes(kMax,tMax){ // unit cubes present when step kMax has placed tMax copies
+const NEUTRAL="#cdd5de";
+function pcol(p){ return PAL[primeIndex(p)%PAL.length]; }
+function cubes(kMax,tMax,flash){ // unit cubes present when step kMax has placed tMax copies; copies of the current step take that prime's colour
   const out=[]; const K=F.length; const d=new Array(K).fill(0);
   const lim=F.map((p,k)=>k<kMax?p:(k===kMax?tMax:1));
   (function rec(k){
     if(k===K){ const c=[0,0,0]; let brick=0, mult=1;
       for(let j=0;j<K;j++){ c[layout.axes[j]]+=d[j]*layout.strides[j]; if(j>0){ brick+=d[j]*mult; mult*=F[j]; } }
-      out.push({x:c[0],y:c[1],z:c[2],col:PAL[brick%PAL.length]}); return; }
+      const fresh=flash&&(kMax===0||d[kMax]>=1);
+      out.push({x:c[0],y:c[1],z:c[2],col:fresh?pcol(F[kMax]):NEUTRAL}); return; }
     for(let i=0;i<lim[k];i++){ d[k]=i; rec(k+1); } d[k]=0;
   })(0);
   return out;
@@ -129,7 +132,8 @@ function fit(c){const r=c.getBoundingClientRect(),dp=window.devicePixelRatio||1;
 function draw(){
   const {g,w:W,h:H,d}=fit($("cv"));
   const K=F.length, kMax=showAll?K-1:stepK, tMax=showAll?F[K-1]:copyT;
-  const cs=cubes(kMax,tMax);
+  const finished=showAll||(stepK===K-1&&copyT===F[K-1]&&!playing);
+  const cs=cubes(kMax,tMax,!finished);
   // isometric projection, fitted to the finished block so the camera does not jump
   const CO=Math.cos(Math.PI/6), SI=0.5, HZ=1.0;
   const P=(x,y,z)=>[(x-y)*CO,(x+y)*SI-z*HZ];
@@ -154,22 +158,43 @@ function draw(){
       g.fillStyle=shade(col,1.08); g.beginPath(); g.ellipse(cx,cy-hh,rx,ry,0,0,2*Math.PI); g.fill(); g.strokeStyle="rgba(0,0,0,0.3)"; g.lineWidth=edge*0.8; g.stroke();
     }
   }
+  // edges in the colours of the prime bricks: the front module carries the first three primes,
+  // later primes (whole blocks repeated) get a thin line along the outside with "×p"
+  const st=layout.strides, ax=layout.axes, O=[0,0,0];
+  for(let k=3;k<K;k++) if(k<=kMax&&ax[k]!==2) O[ax[k]]+=((k<kMax?F[k]:tMax)-1)*st[k];   // front-most module, on the ground
+  const e=[F[0], K>1&&kMax>=1?F[1]:1, K>2&&kMax>=2?F[2]:1];
+  if(K>1&&kMax===1) e[1]=tMax; if(K>2&&kMax===2) e[2]=tMax;
+  const line=(a,b,col,wdt)=>{ const [x1,y1]=S(...a), [x2,y2]=S(...b); g.strokeStyle=col; g.lineWidth=wdt; g.lineCap="round"; g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke(); return [(x1+x2)/2,(y1+y2)/2]; };
+  const lab=(t,x,y,col,al)=>{ g.font="bold "+(13*d)+"px "+MONO; g.textAlign=al; g.fillStyle="#081a2e"; g.fillText(t,x+1*d,y+1*d); g.fillStyle=col; g.fillText(t,x,y); g.textAlign="left"; };
+  const LW=4*d;
+  let m=line([O[0],O[1]+e[1],O[2]],[O[0]+F[0],O[1]+e[1],O[2]],pcol(F[0]),LW); lab(String(F[0]),m[0]-10*d,m[1]+18*d,pcol(F[0]),"right");
+  if(K>1&&kMax>=1){ m=line([O[0]+e[0],O[1],O[2]],[O[0]+e[0],O[1]+e[1],O[2]],pcol(F[1]),LW); lab(String(F[1]),m[0]+10*d,m[1]+18*d,pcol(F[1]),"left"); }
+  if(K>2&&kMax>=2){ m=line([O[0]+e[0],O[1]+e[1],O[2]],[O[0]+e[0],O[1]+e[1],O[2]+e[2]],pcol(F[2]),LW); lab(String(F[2]),m[0]+10*d,m[1],pcol(F[2]),"left"); }
+  for(let k=3;k<K&&k<=kMax;k++){
+    const a=ax[k], lvl=Math.floor(k/3), off=0.9*lvl+0.4, Ex=layout.ext, c=pcol(F[k]);
+    let A,B,al,dx,dy;
+    if(a===0){ A=[0,Ex[1]+off,0]; B=[Ex[0],Ex[1]+off,0]; al="right"; dx=-8*d; dy=16*d; }
+    else if(a===1){ A=[Ex[0]+off,0,0]; B=[Ex[0]+off,Ex[1],0]; al="left"; dx=8*d; dy=16*d; }
+    else { A=[Ex[0]+off,-off,0]; B=[Ex[0]+off,-off,Ex[2]]; al="left"; dx=10*d; dy=0; }
+    m=line(A,B,c,2*d); lab("×"+F[k],m[0]+dx,m[1]+dy,c,al);
+  }
   g.fillStyle="#9fb3c8"; g.font=(12*d)+"px "+MONO; g.fillText(cs.length+" studs",10*d,H-10*d);
-  drawKit(g,W,d);
+  drawKit(g,W,d,kMax,finished);
   describe(kMax,tMax);
 }
 function primeIndex(p){let c=0;for(let q=2;q<p;q++) if(isPrime(q)) c++;return c;}
-function drawKit(g,W,d){ // the prime bricks this number is built from, as loose pieces
+function drawKit(g,W,d,kMax,finished){ // the prime bricks this number is built from, as loose pieces; the one in use is ringed
   const u=13*d; let x=10*d, y=14*d;
   g.font=(11*d)+"px "+MONO; g.fillStyle="#9fb3c8"; g.fillText("kit:",x,y+0.75*u); x+=34*d;
-  for(const p of F){
+  F.forEach((p,k)=>{
     const len=Math.min(p,14), w=len*u, col=PAL[primeIndex(p)%PAL.length];
     if(x+w>W-10*d){ x=44*d; y+=2.4*u; }
     g.fillStyle=col; g.fillRect(x,y,w,u); g.strokeStyle="rgba(0,0,0,0.4)"; g.lineWidth=1*d; g.strokeRect(x,y,w,u);
     g.fillStyle=shade(col,1.12); for(let i=0;i<len;i++){ g.beginPath(); g.arc(x+(i+0.5)*u,y-0.12*u,0.28*u,0,2*Math.PI); g.fill(); }
     g.fillStyle="#e8eef5"; g.fillText(String(p)+(p>14?" (long)":""),x,y+u+11*d);
+    if(!finished&&k===kMax){ g.strokeStyle="#e8eef5"; g.lineWidth=1.5*d; g.strokeRect(x-4*d,y-0.6*u,w+8*d,u*1.6+14*d); }
     x+=w+12*d;
-  }
+  });
 }
 const AX=["side by side","in rows","stacked up"];
 function describe(kMax,tMax){
