@@ -55,7 +55,7 @@ a{color:var(--line)}
 <div>
   <a class="back" href="line.html">← The factorisation line</a>
   <h1>Numbers built from bricks, <em>primes as single bricks</em></h1>
-  <p class="lede">Think of every number as unit studs clicked together. A prime can only be one long brick, 1×p: there is no way to build it from identical copies of a smaller brick. Every other number is assembled by copying, one copy step for each prime factor. Whatever order you copy in, you end up with the same block.</p>
+  <p class="lede">The primes are the bricks themselves. The box contains only prime bricks, 2, 3, 5, 7, 11, …, and every other number is something you build from them: each prime brick sets one edge of the finished block. 12 is built from the kit 2, 2, 3. Every number has exactly one kit, and a prime is a kit with a single brick in it.</p>
 </div>
 
 <section>
@@ -82,7 +82,7 @@ a{color:var(--line)}
   <h2>How the building works</h2>
   <p>Write the number as a product of primes, smallest first: 12 = 2 · 2 · 3. Start with one brick of length 2. Copy it 2 times side by side: a 2×2 plate. Stack 3 of those plates: a 2×2×3 block of twelve studs. Each prime factor is one copying step, in its own direction.</p>
   <p>After three steps every direction is used, so a fourth factor copies the whole block side by side with a small gap, like a module repeated in a building set; a fifth repeats that row of modules, and so on. The number of copying steps is the number of prime factors counted with repetition, the number of directions the number can unfold into.</p>
-  <div class="callout"><p>A prime is the brick that cannot be built from copies. Every other number has exactly one finished block with prime edges: that is the fundamental theorem of arithmetic, in plastic.</p></div>
+  <div class="callout"><p>The primes are the bricks; every other number is a build. Each number comes with exactly one kit of prime bricks, and so exactly one finished block with prime edges: that is the fundamental theorem of arithmetic, in plastic.</p></div>
   <p>Order does not matter for the finished shape: copying 3 times and then 2 times gives the same block as 2 and then 3, just turned. Try the rich numbers like 360 = 2·2·2·3·3·5 or 720, with six or seven copy steps, against a prime like 359 next to them, which stays a single brick.</p>
 </section>
 
@@ -155,13 +155,27 @@ function draw(){
     }
   }
   g.fillStyle="#9fb3c8"; g.font=(12*d)+"px "+MONO; g.fillText(cs.length+" studs",10*d,H-10*d);
+  drawKit(g,W,d);
   describe(kMax,tMax);
+}
+function primeIndex(p){let c=0;for(let q=2;q<p;q++) if(isPrime(q)) c++;return c;}
+function drawKit(g,W,d){ // the prime bricks this number is built from, as loose pieces
+  const u=13*d; let x=10*d, y=14*d;
+  g.font=(11*d)+"px "+MONO; g.fillStyle="#9fb3c8"; g.fillText("kit:",x,y+0.75*u); x+=34*d;
+  for(const p of F){
+    const len=Math.min(p,14), w=len*u, col=PAL[primeIndex(p)%PAL.length];
+    if(x+w>W-10*d){ x=44*d; y+=2.4*u; }
+    g.fillStyle=col; g.fillRect(x,y,w,u); g.strokeStyle="rgba(0,0,0,0.4)"; g.lineWidth=1*d; g.strokeRect(x,y,w,u);
+    g.fillStyle=shade(col,1.12); for(let i=0;i<len;i++){ g.beginPath(); g.arc(x+(i+0.5)*u,y-0.12*u,0.28*u,0,2*Math.PI); g.fill(); }
+    g.fillStyle="#e8eef5"; g.fillText(String(p)+(p>14?" (long)":""),x,y+u+11*d);
+    x+=w+12*d;
+  }
 }
 const AX=["side by side","in rows","stacked up"];
 function describe(kMax,tMax){
   const K=F.length;
-  if(K===1){ $("read").textContent=N+" is prime: one single 1×"+N+" brick. It cannot be built from identical copies of any smaller brick."; return; }
-  const lines=[N+" = "+F.join(" · ")+"   ("+K+" copy steps)"];
+  if(K===1){ $("read").textContent=N+" is prime: it is a brick itself, a single 1×"+N+". It cannot be built from other bricks."; return; }
+  const lines=[N+" = "+F.join(" · ")+"   kit: "+F.join(", ")+"   ("+K+" bricks)"];
   lines.push("Start: one 1×"+F[0]+" brick.");
   for(let k=1;k<K;k++){
     const lvl=Math.floor(k/3), what=k<3?(k===1?"copy it":"copy that"):"copy the whole "+(lvl===1?"block":"group");
