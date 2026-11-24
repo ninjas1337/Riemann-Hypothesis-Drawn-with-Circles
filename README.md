@@ -49,6 +49,12 @@ Every whole number drawn as all of its rectangles a×b at once, centred, equal i
 
 The numbers in order as tiles: each prime a thin 1×p strip, every other number all of its rectangles with sides of at least 2 (4 → 2×2, 6 → 2×3, 8 → 2×4, 9 → 3×3, 12 → 2×6 and 3×4, …), placed greedily where the farthest corner stays closest to the start, with a disc-coverage trace. Composite tiles are at least 2 wide, so only the primes' strips can seal 1-wide cracks: the primes are the mortar. A second mode uses only prime×prime rectangles for comparison. A third, **Perfect**, keeps the tiled area a complete rectangle at every step (Henle-style: smallest unused tile along one side, exact-size unused fillers, rotating sides), so the plane is tiled with no gaps, every tile used exactly once; the page exposes the tiles so the gap-free property can be checked.
 
+## The Factorisation Line
+
+👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/line.html**
+
+Every rectangle of every factorisation (both sides at least 2) laid side by side on the real line from 2×2 upwards, standing or lying; each prime is left empty, as a dashed spire 1 wide and p tall (standing) or a gap of length p (lying). Each composite shows up as a little falling staircase of its rectangles. With the rectangles lying down the empty share of the line is predicted by li(N²) − ½li(N^{3/2}) − … against an exact composite length of about (π²/6 − 1)·N²/2: roughly 1/(1 + (π²/6 − 1)·ln N), so 20% empty at 1,000 and 12% at 100,000.
+
 ## Mathematical background
 
 The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to

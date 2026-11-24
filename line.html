@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Factorisation Line</title>
+<meta name="description" content="Every rectangle of every factorisation laid side by side on the real line, from 2×2 upwards. The primes stay empty, and the share of empty line follows the prime number theorem.">
+<meta property="og:title" content="The Factorisation Line">
+<meta property="og:description" content="Composite rectangles side by side on one line, the primes left empty.">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Blueprint theme shared with the companion pages. One column: a close-up of the growing end of the line, the whole line compressed, and the share of empty line against its prediction. */
+  --bp:#0f2a47; --deep:#0b2039; --ink:#e8eef5; --muted:#9fb3c8; --grid:#1f4268;
+  --brass:#d9a441; --line:#7fc4e8; --zeta:#a7e3a1; --hot:#f08a4b;
+  --font-display:"Source Serif 4", Georgia, serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--deep);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:24px}
+.back{font-size:.9rem;color:var(--line)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:4px 0 8px;text-wrap:balance}
+h1 em{color:var(--hot);font-weight:400}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0;text-wrap:balance}
+p{margin:0;max-width:70ch}
+.lede{color:var(--muted);font-size:1.06rem}
+section{display:grid;gap:12px}
+.sheet{background:var(--bp);border:1px solid var(--grid);border-radius:10px;padding:12px;display:grid;gap:10px}
+canvas{display:block;width:100%;border-radius:6px;background:#081a2e}
+#cvA{aspect-ratio:2.2/1} #cvB{aspect-ratio:4/1} #cvC{aspect-ratio:3/1;background:var(--bp)}
+.row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:.9rem}
+.row label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--brass);width:min(160px,100%)}
+button{font:inherit;font-size:.86rem;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button.on{background:var(--brass);border-color:var(--brass);color:var(--deep);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.read{font-family:var(--font-mono);font-size:.84rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:pre-wrap}
+.key{display:inline-block;width:.85em;height:.85em;border-radius:2px;vertical-align:-.08em;margin-right:4px}
+.formula{font-family:var(--font-mono);font-size:.95rem;background:var(--bp);border:1px solid var(--grid);border-radius:8px;padding:10px 14px;overflow-x:auto;max-width:70ch}
+.callout{border-left:4px solid var(--hot);background:var(--bp);padding:12px 16px;border-radius:0 8px 8px 0;max-width:70ch}
+footer{border-top:1px solid var(--grid);padding-top:16px;font-size:.85rem;color:var(--muted);display:grid;gap:8px}
+footer ol{margin:0;padding-left:20px;display:grid;gap:4px}
+a{color:var(--line)}
+</style>
+</head>
+<body>
+<main>
+<div>
+  <a class="back" href="tiles.html">← Growing a tiling from the numbers</a>
+  <h1>The factorisation line, <em>primes left empty</em></h1>
+  <p class="lede">Lay every rectangle of every factorisation on the real line, one after another, from the smallest up: 2×2, 2×3, 2×4, 3×3, 2×5, 2×6, 3×4, … Each prime has no rectangle with both sides at least 2, so it leaves an empty gap of its own length. Watch the line develop.</p>
+</div>
+
+<section>
+  <div class="sheet">
+    <canvas id="cvA" role="img" aria-label="Close-up of the growing end of the line: composite rectangles side by side, empty gaps for primes"></canvas>
+    <div class="row">
+      <button id="run" class="on" type="button">Pause</button>
+      <button id="reset" type="button">Restart</button>
+      <label for="speed">Speed <input id="speed" type="range" min="1" max="40" value="8"></label>
+      <label for="Nmax">Up to n = <input id="Nmax" type="range" min="50" max="3000" value="600"> <b class="num" id="Nv">600</b></label>
+    </div>
+    <div class="row">
+      <button id="oStand" class="on" type="button">Standing (short side on the line)</button>
+      <button id="oLie" type="button">Lying (long side on the line)</button>
+    </div>
+    <p class="read">Colour = the short side:  <span class="key" style="background:#e3b15c"></span>2  <span class="key" style="background:var(--zeta)"></span>3  <span class="key" style="background:var(--line)"></span>4 or 5  <span class="key" style="background:#b9a3e3"></span>6 and up  <span class="key" style="border:1.5px dashed var(--hot)"></span>prime, left empty</p>
+    <p class="read" id="readA"></p>
+  </div>
+  <div class="sheet">
+    <canvas id="cvB" role="img" aria-label="The whole line so far, squeezed horizontally, with the empty prime gaps marked"></canvas>
+    <p class="read">The whole line so far, squeezed sideways (heights not to scale). Orange ticks under the line mark the empty prime gaps.</p>
+  </div>
+</section>
+
+<section>
+  <h2>How much of the line is empty?</h2>
+  <p>Measured with the rectangles lying down, so every number n adds length in proportion to its size.</p>
+  <div class="sheet">
+    <canvas id="cvC" role="img" aria-label="Share of the line left empty by primes, measured and predicted"></canvas>
+    <p class="read" id="readC"></p>
+  </div>
+  <p>With the rectangles lying down, each composite rectangle a×b adds its long side b to the line, and each prime p adds an empty stretch of length p. Up to N the rectangles add up to about (π²/6 − 1)·N²/2, because there are about N/a rectangles with short side a, with lengths up to N/a. The empty stretches add up to the sum of all primes up to N, which the prime number theorem puts at about li(N²) ≈ N²/(2 ln N).</p>
+  <div class="formula">empty share ≈ li(N²) / (li(N²) + composite length)  ≈  1 / (1 + (π²/6 − 1)·ln N)</div>
+  <p>The dashed prediction uses Riemann's refinement for the sum of primes, li(N²) − ½·li(N<sup>3/2</sup>) − ⅓·li(N<sup>4/3</sup>) − …, which accounts for the squares and higher powers of primes. What is left between the two curves is the wobble that comes from the zeta zeros.</p>
+  <p>So the primes' emptiness thins out, but only like 1/ln N: about 20% of the line is empty at N = 1,000, 15% at 10,000 and 12% at 100,000. The famous π²/6 = 1 + 1/4 + 1/9 + … turns up because of the squares 1/a² in that count.</p>
+  <div class="callout"><p>The composites fill the line almost evenly; the primes are the holes, and the holes get rarer exactly as fast as the primes do. The small wobble of the measured share around the prediction is the same prime wobble the circle chain shows.</p></div>
+</section>
+
+<footer>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a> · <a href="tiles.html">Growing a tiling from the numbers</a>. The composite length in the prediction is counted exactly; only the prime part is smooth: Σ<sub>k</sub> μ(k)/k·li(N<sup>1+1/k</sup>) for the sum of primes. In the standing view each prime is an empty spire 1 wide and p tall.</p>
+  <ol>
+    <li>L. Euler, De summis serierum reciprocarum (1735/1740): 1 + 1/4 + 1/9 + … = π²/6.</li>
+    <li>E. Landau, <i>Handbuch der Lehre von der Verteilung der Primzahlen</i>, Teubner, 1909 (sums over primes, Σ<sub>p≤x</sub> p ∼ li(x²)).</li>
+    <li>H. Davenport, <i>Multiplicative Number Theory</i>, 3rd ed., Springer, 2000, ch. 18 (the prime number theorem with error term).</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const C={muted:"#9fb3c8",grid:"#1f4268",brass:"#d9a441",line:"#7fc4e8",zeta:"#a7e3a1",hot:"#f08a4b",two:"#e3b15c",seven:"#b9a3e3",ink:"#e8eef5"};
+const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function isPrime(n){if(n<2)return false;for(let q=2;q*q<=n;q++) if(n%q===0) return false;return true;}
+function li(x){const L=Math.log(x);let a=L,inner=1,s=a;for(let n=2;n<600;n++){a*=-L/(2*n);if(n%2===1)inner+=1/n;const t=a*inner;s+=t;if(Math.abs(t)<1e-17*Math.abs(s)&&n>L)break;}return 0.5772156649015329+Math.log(L)+Math.sqrt(x)*s;}
+let lying=false, Nmax=600, n=3, items=[], xEnd=0, running=!reduce, acc=0, done=false, hist=[];
+let emptyLen=0, fullLen=0, emptyLie=0, fullLie=0;
+function colour(a){ return a===2?C.two:a===3?C.zeta:a<=5?C.line:C.seven; }
+function reset(){ n=3; items=[]; xEnd=0; done=false; hist=[]; emptyLen=0; fullLen=0; emptyLie=0; fullLie=0; acc=0; running=!reduce; $("run").textContent=running?"Pause":"Run"; $("run").classList.toggle("on",running); draw(); }
+function addNumber(){ // add all items of the next number
+  n++;
+  if(n>Nmax){ done=true; return false; }
+  if(isPrime(n)){ const L=lying?n:1, H=lying?1:n; items.push({x:xEnd,w:L,h:H,n,prime:true}); xEnd+=L; emptyLen+=L; emptyLie+=n; }
+  else { for(let a=2;a*a<=n;a++){ if(n%a) continue; const b=n/a; const L=lying?b:a, H=lying?a:b; items.push({x:xEnd,w:L,h:H,n,a,b}); xEnd+=L; fullLen+=L; fullLie+=b; } }
+  hist.push([n,emptyLie/(emptyLie+fullLie||1)]);   // the share is always measured with the rectangles lying down
+  return true;
+}
+function predicted(N){ // exact composite length, prime part from li
+  let comp=0; for(let a=2;a*a<=N;a++){ const M=Math.floor(N/a); if(M<a) break; comp+= M*(M+1)/2 - (a-1)*a/2; }
+  // primes from 5 on (the line starts at 4). Riemann-style smooth parts:
+  //   sum of p ≤ N  ≈ Σ μ(k)/k · li(N^(1+1/k)),   number of p ≤ N ≈ R(N) = Σ μ(k)/k · li(N^(1/k))
+  const MU=[0,1,-1,-1,0,-1,1,-1,0,0,1,-1,0];
+  let P=0;
+  for(let k=1;k<=12;k++){ if(!MU[k]) continue; P+=MU[k]/k*li(Math.pow(N,1+1/k)); }
+  P-=5;
+  return P/(P+comp);
+}
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
+function drawA(){
+  const {g,w:W,h:H,d}=fit($("cvA"));
+  const base=H*0.86;
+  g.strokeStyle=C.muted; g.lineWidth=1.2*d; g.beginPath(); g.moveTo(0,base); g.lineTo(W,base); g.stroke();
+  if(!items.length) return;
+  // find a window at the end of the line whose tallest item fits ~75% of the height
+  let mh=1, span=0; for(let i=Math.max(0,items.length-24);i<items.length;i++){ mh=Math.max(mh,items[i].h); span+=items[i].w; }
+  const s=Math.min((base*0.8)/mh, W/Math.max(4,span*1.05));
+  const x0=Math.max(0,xEnd-(W/s)*0.97);
+  g.font=(11*d)+"px "+MONO; g.textAlign="center"; g.textBaseline="middle";
+  for(let i=items.length-1;i>=0;i--){ const t=items[i]; if(t.x+t.w<x0) break;
+    const x=(t.x-x0)*s, w=t.w*s, h=t.h*s, y=base-h;
+    if(t.prime){ g.setLineDash([4*d,3*d]); g.strokeStyle=C.hot; g.lineWidth=1.3*d; g.strokeRect(x,y,w,h); g.setLineDash([]);
+      if(w>22*d||h>22*d){ g.fillStyle=C.hot; g.fillText(String(t.n), x+w/2, lying? base+12*d : y-8*d); } }
+    else { g.fillStyle=colour(Math.min(t.a,t.b)); g.globalAlpha=0.7; g.fillRect(x,y,w,h); g.globalAlpha=1; g.strokeStyle="#081a2e"; g.lineWidth=1*d; g.strokeRect(x,y,w,h);
+      const lab=t.a+"×"+t.b; if(g.measureText(lab).width<w-4*d&&h>13*d){ g.fillStyle="#081a2e"; g.fillText(lab,x+w/2,y+h/2); } }
+  }
+  g.textAlign="left"; g.textBaseline="alphabetic";
+}
+function drawB(){
+  const {g,w:W,h:H,d}=fit($("cvB"));
+  const base=H*0.78; if(!items.length) return;
+  let mh=1; for(const t of items) mh=Math.max(mh,t.h);
+  const sx=W/Math.max(1,xEnd), sy=(base*0.9)/mh;
+  for(const t of items){ const x=t.x*sx, w=Math.max(t.w*sx,0.5);
+    if(t.prime){ g.fillStyle=C.hot; g.fillRect(x,base+3*d,Math.max(w,1*d),5*d); }
+    else { g.fillStyle=colour(Math.min(t.a,t.b)); g.globalAlpha=0.75; g.fillRect(x,base-t.h*sy,w,t.h*sy); g.globalAlpha=1; } }
+  g.strokeStyle=C.muted; g.lineWidth=1*d; g.beginPath(); g.moveTo(0,base); g.lineTo(W,base); g.stroke();
+}
+function drawC(){
+  const {g,w:W,h:H,d}=fit($("cvC"));
+  const pad={l:44*d,r:10*d,t:10*d,b:22*d}; const N=Math.max(20,Nmax);
+  const ymax=0.5, X=v=>pad.l+(Math.log(v)-Math.log(5))/(Math.log(N)-Math.log(5))*(W-pad.l-pad.r), Y=v=>pad.t+(H-pad.t-pad.b)*(1-v/ymax);
+  g.strokeStyle=C.grid; g.lineWidth=1; g.fillStyle=C.muted; g.font=(10*d)+"px "+MONO;
+  for(const v of [0.1,0.2,0.3,0.4]){ g.beginPath(); g.moveTo(pad.l,Y(v)); g.lineTo(W-pad.r,Y(v)); g.stroke(); g.fillText((v*100)+"%",4*d,Y(v)+3*d); }
+  for(const v of [10,100,1000]){ if(v>N) continue; g.fillText(String(v),X(v)-8*d,H-6*d); }
+  g.strokeStyle=C.line; g.setLineDash([5*d,4*d]); g.lineWidth=1.4*d; g.beginPath(); let first=true;
+  for(let i=0;i<=120;i++){ const v=Math.exp(Math.log(8)+(Math.log(N)-Math.log(8))*i/120); const p=predicted(Math.floor(v)); const x=X(v), y=Y(p); first?g.moveTo(x,y):g.lineTo(x,y); first=false; } g.stroke(); g.setLineDash([]);
+  g.strokeStyle=C.hot; g.lineWidth=1.6*d; g.beginPath(); hist.forEach(([m,v],i)=>{ if(m<5) return; const x=X(m), y=Y(v); i?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke();
+  const last=hist[hist.length-1];
+  $("readC").textContent=last?("Empty share at n = "+last[0]+": "+(100*last[1]).toFixed(2)+"% measured (orange), "+(100*predicted(last[0])).toFixed(2)+"% predicted (dashed blue)."):"";
+}
+function draw(){
+  drawA(); drawB(); drawC();
+  const lastItem=items[items.length-1];
+  $("readA").textContent="Numbers placed up to n = "+Math.min(n,Nmax)+(done?" (finished)":"")+".  Line length "+xEnd+", of which "+emptyLen+" empty (primes)."+(lastItem?("  Latest: "+(lastItem.prime?("prime "+lastItem.n+", left empty"):(lastItem.a+"×"+lastItem.b+" from "+lastItem.n))):"");
+}
+function frame(){
+  if(running&&!done){ acc+=(+$("speed").value)/10; let k=0; while(acc>=1&&k<200){ acc-=1; if(!addNumber()) break; k++; } if(k) draw(); if(done){ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); draw(); } }
+  requestAnimationFrame(frame);
+}
+$("run").addEventListener("click",function(){ if(done) reset(); running=!running; this.textContent=running?"Pause":"Run"; this.classList.toggle("on",running); });
+$("reset").addEventListener("click",reset);
+$("Nmax").addEventListener("input",function(){ Nmax=+this.value; $("Nv").textContent=Nmax; });
+$("Nmax").addEventListener("change",reset);
+$("oLie").addEventListener("click",function(){ lying=true; this.classList.add("on"); $("oStand").classList.remove("on"); reset(); });
+$("oStand").addEventListener("click",function(){ lying=false; this.classList.add("on"); $("oLie").classList.remove("on"); reset(); });
+window.addEventListener("resize",draw);
+if(reduce){ $("run").textContent="Run"; $("run").classList.remove("on"); }
+reset(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
