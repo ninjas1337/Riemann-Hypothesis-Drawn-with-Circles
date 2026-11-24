@@ -43,6 +43,7 @@ Related: [Prime Helix](https://github.com/ninjas1337/Prime-Helix) · [Gibbs phen
 - B. Riemann, *Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse*, Monatsber. Berliner Akad., 1859.
 - H. von Koch, *Sur la distribution des nombres premiers*, Acta Math. 24 (1901), 159–182.
 - H. Davenport, *Multiplicative Number Theory*, 3rd ed., Springer GTM 74, 2000, ch. 17–18.
+- J. E. Littlewood, *Sur la distribution des nombres premiers*, C. R. Acad. Sci. Paris 158 (1914), 1869–1872.
 - H. Cramér, *On the order of magnitude of the difference between consecutive prime numbers*, Acta Arith. 2 (1936), 23–46.
 - A. M. Odlyzko, *Tables of zeros of the Riemann zeta function*.
 
