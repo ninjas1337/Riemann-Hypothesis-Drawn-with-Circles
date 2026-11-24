@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Growing a Tiling from Prime Rectangles</title>
+<meta name="description" content="Start with a 2×2 square, then 2×3, 3×3, 2×5: every rectangle with prime sides, in order of area, packed as tightly as possible. Watch the gaps, and see what the primes' thin strips do to them.">
+<meta property="og:title" content="Growing a Tiling from Prime Rectangles">
+<meta property="og:description" content="Every prime×prime rectangle, packed in order of size. Can they close every gap?">
+<meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
+<meta name="author" content="Sanjin Redzic">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Blueprint theme shared with the companion pages. One column: the growing tiling with its controls and live numbers, a density trace, then the explanation. */
+  --bp:#0f2a47; --deep:#0b2039; --ink:#e8eef5; --muted:#9fb3c8; --grid:#1f4268;
+  --brass:#d9a441; --line:#7fc4e8; --zeta:#a7e3a1; --hot:#f08a4b;
+  --font-display:"Source Serif 4", Georgia, serif;
+  --font-body:"Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--deep);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+main{max-width:900px;margin:0 auto;padding:24px 16px 56px;display:grid;gap:24px}
+.back{font-size:.9rem;color:var(--line)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.1;margin:4px 0 8px;text-wrap:balance}
+h1 em{color:var(--hot);font-weight:400}
+h2{font-family:var(--font-display);font-weight:600;font-size:1.4rem;margin:0;text-wrap:balance}
+p{margin:0;max-width:70ch}
+.lede{color:var(--muted);font-size:1.06rem}
+section{display:grid;gap:12px}
+.sheet{background:var(--bp);border:1px solid var(--grid);border-radius:10px;padding:12px;display:grid;gap:10px}
+canvas{display:block;width:100%;border-radius:6px;background:#081a2e}
+#cvT{aspect-ratio:1/1} #cvG{aspect-ratio:4/1;background:var(--bp)}
+.row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:.9rem}
+.row label{display:flex;gap:8px;align-items:center}
+input[type=range]{accent-color:var(--brass);width:min(160px,100%)}
+button{font:inherit;font-size:.86rem;border:1px solid var(--grid);background:var(--deep);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button.on{background:var(--brass);border-color:var(--brass);color:var(--deep);font-weight:700}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.read{font-family:var(--font-mono);font-size:.84rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:pre-wrap}
+.key{display:inline-block;width:.85em;height:.85em;border-radius:2px;vertical-align:-.08em;margin-right:4px}
+.callout{border-left:4px solid var(--hot);background:var(--bp);padding:12px 16px;border-radius:0 8px 8px 0;max-width:70ch}
+footer{border-top:1px solid var(--grid);padding-top:16px;font-size:.85rem;color:var(--muted);display:grid;gap:8px}
+footer ol{margin:0;padding-left:20px;display:grid;gap:4px}
+a{color:var(--line)}
+</style>
+</head>
+<body>
+<main>
+<div>
+  <a class="back" href="factors.html">← Every number as rectangles</a>
+  <h1>Growing a tiling from <em>prime rectangles</em></h1>
+  <p class="lede">Start with a 2×2 square. Then 2×3, 3×3, 2×5, 2×7, 3×5, … every rectangle whose two sides are both prime, in order of area, each one used once. Every new tile goes where it keeps the cluster as tight and round as possible. Watch which gaps close and which stay open forever.</p>
+</div>
+
+<section>
+  <div class="sheet">
+    <canvas id="cvT" role="img" aria-label="A growing cluster of rectangles with prime sides, packed as tightly as possible"></canvas>
+    <div class="row">
+      <button id="run" class="on" type="button">Pause</button>
+      <button id="stepB" type="button">One tile</button>
+      <button id="reset" type="button">Restart</button>
+      <label for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"></label>
+    </div>
+    <div class="row">
+      <button id="mPrime" class="on" type="button">Prime × prime</button>
+      <button id="mAll" type="button">Every factorisation</button>
+      <label for="maxT">Stop after <input id="maxT" type="range" min="20" max="400" value="220"> <b class="num" id="maxTv">220</b> tiles</label>
+    </div>
+    <p class="read">Colour = the short side:  <span class="key" style="background:var(--hot)"></span>1 (a prime's strip)  <span class="key" style="background:#e3b15c"></span>2  <span class="key" style="background:var(--zeta)"></span>3  <span class="key" style="background:var(--line)"></span>4 or 5  <span class="key" style="background:#b9a3e3"></span>6 and up
+Dark background showing through = a gap.</p>
+    <p class="read" id="readT"></p>
+  </div>
+  <div class="sheet">
+    <canvas id="cvG" role="img" aria-label="How much of the enclosing disc the tiles cover, tile by tile"></canvas>
+    <p class="read" id="readG"></p>
+  </div>
+</section>
+
+<section>
+  <h2>The rule</h2>
+  <p>Each new tile is tried against every placed tile: beside it, above it, below it, lined up with either corner, standing up or lying down. Of all the spots where it overlaps nothing, it takes the one whose farthest corner is closest to the starting point. That keeps the cluster growing like a round crystal and pushes every tile into the tightest nook available. Ties go to the spot that touches the most existing edge.</p>
+  <p>The density trace shows how much of the smallest disc around the cluster is covered. Like the circle chain, it wobbles: it drops whenever a big tile sticks out, and climbs when smaller ones fill in behind it.</p>
+</section>
+
+<section>
+  <h2>Why some gaps never close</h2>
+  <p>Every prime×prime tile is at least 2 wide. A crack only 1 unit wide can never be filled by any later tile, however long you wait. In the prime×prime tiling, those cracks are permanent.</p>
+  <p>Switch to <b>every factorisation</b> and the tile set includes every rectangle a×b, each used once, ordered by area. Now the primes arrive as thin 1×p strips, and they are exactly the tiles that can slip into the 1-wide cracks.</p>
+  <div class="callout"><p>In the full set of factorisations the primes play the role of mortar. They are the only numbers whose single rectangle is one unit wide, and they keep arriving forever.</p></div>
+  <p>Whether the prime×prime rectangles, one of each, could tile the whole plane with a cleverer rule than this greedy one, I do not know of a result. For squares the question is settled: one square of every whole-number side tiles the plane (Henle and Henle, 2008), but squares with prime sides cannot (Henle and Henle, 2015).</p>
+</section>
+
+<footer>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a>. The packing rule is a simple greedy heuristic, chosen for clarity, not an optimal packing.</p>
+  <ol>
+    <li>F. V. Henle &amp; J. M. Henle, Squaring the plane, <i>Amer. Math. Monthly</i> 115 (2008), 3–12.</li>
+    <li>J. M. Henle &amp; F. V. Henle, Squaring the plane, and the even numbers, <i>Amer. Math. Monthly</i> (2015); see also the survey at squaring.net.</li>
+    <li>R. L. Brooks, C. A. B. Smith, A. H. Stone &amp; W. T. Tutte, The dissection of rectangles into squares, <i>Duke Math. J.</i> 7 (1940), 312–340.</li>
+  </ol>
+</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const C={bp:"#0f2a47",ink:"#e8eef5",muted:"#9fb3c8",grid:"#1f4268",brass:"#d9a441",line:"#7fc4e8",zeta:"#a7e3a1",hot:"#f08a4b",two:"#e3b15c",seven:"#b9a3e3"};
+const MONO='"JetBrains Mono", ui-monospace, Menlo, monospace';
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function isPrime(n){if(n<2)return false;for(let q=2;q*q<=n;q++) if(n%q===0) return false;return true;}
+function tileList(mode,count){ // rectangles a×b (a ≤ b) ordered by area, then by a
+  const L=[];
+  for(let n=2;L.length<count;n++){
+    for(let a=1;a*a<=n;a++){ if(n%a) continue; const b=n/a;
+      if(mode==="prime"){ if(isPrime(a)&&isPrime(b)) L.push([a,b]); }
+      else { if(!(a===1&&b===1)) L.push([a,b]); }
+      if(L.length>=count) break; }
+  }
+  return L;
+}
+let mode="prime", maxT=220, tiles=[], order=[], idx=0, running=!reduce, dens=[], acc=0, done=false;
+function reset(){ order=tileList(mode,maxT); tiles=[]; idx=0; dens=[]; done=false;
+  const [a,b]=order[0]; tiles.push({x:-b/2,y:-a/2,w:b,h:a,a,b}); idx=1; dens.push(density()); draw(); }
+
+function overlaps(x,y,w,h){ for(const t of tiles){ if(x<t.x+t.w-1e-9&&t.x<x+w-1e-9&&y<t.y+t.h-1e-9&&t.y<y+h-1e-9) return true; } return false; }
+function contact(x,y,w,h){ let c=0; for(const t of tiles){
+  if(Math.abs(x-(t.x+t.w))<1e-9||Math.abs(t.x-(x+w))<1e-9){ const o=Math.min(y+h,t.y+t.h)-Math.max(y,t.y); if(o>0) c+=o; }
+  if(Math.abs(y-(t.y+t.h))<1e-9||Math.abs(t.y-(y+h))<1e-9){ const o=Math.min(x+w,t.x+t.w)-Math.max(x,t.x); if(o>0) c+=o; } } return c; }
+function farCorner(x,y,w,h){ const xs=[x,x+w], ys=[y,y+h]; let m=0; for(const u of xs) for(const v of ys) m=Math.max(m,u*u+v*v); return m; }
+function place(){
+  if(idx>=order.length){ done=true; return false; }
+  const [a,b]=order[idx]; const dims=a===b?[[a,a]]:[[b,a],[a,b]];
+  let best=null;
+  for(const t of tiles) for(const [W,H] of dims){
+    const cand=[[t.x+t.w,t.y],[t.x+t.w,t.y+t.h-H],[t.x-W,t.y],[t.x-W,t.y+t.h-H],[t.x,t.y+t.h],[t.x+t.w-W,t.y+t.h],[t.x,t.y-H],[t.x+t.w-W,t.y-H]];
+    for(const [x,y] of cand){
+      const f=farCorner(x,y,W,H);
+      if(best&&f>best.f+1e-9) continue;
+      if(overlaps(x,y,W,H)) continue;
+      const c=contact(x,y,W,H);
+      if(!best||f<best.f-1e-9||c>best.c){ best={x,y,w:W,h:H,f,c}; }
+    }
+  }
+  tiles.push({x:best.x,y:best.y,w:best.w,h:best.h,a,b}); idx++; dens.push(density()); return true;
+}
+function density(){ let A=0,R2=0; for(const t of tiles){ A+=t.w*t.h; R2=Math.max(R2,farCorner(t.x,t.y,t.w,t.h)); } return A/(Math.PI*R2); }
+function colour(a){ return a===1?C.hot:a===2?C.two:a===3?C.zeta:a<=5?C.line:C.seven; }
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);return {g,w,h,d};}
+
+function draw(){
+  const {g,w:W,h:H,d}=fit($("cvT"));
+  let R=4; for(const t of tiles) R=Math.max(R,Math.sqrt(farCorner(t.x,t.y,t.w,t.h)));
+  const s=Math.min(W,H)*0.47/R, cx=W/2, cy=H/2;
+  g.strokeStyle="rgba(127,196,232,0.25)"; g.setLineDash([4*d,4*d]); g.lineWidth=1*d; g.beginPath(); g.arc(cx,cy,R*s,0,2*Math.PI); g.stroke(); g.setLineDash([]);
+  g.font=Math.max(9,Math.min(13,s*0.9))*d/ (d>1?1:1)+"px "+MONO; g.textAlign="center"; g.textBaseline="middle";
+  tiles.forEach((t,i)=>{
+    const x=cx+t.x*s, y=cy-(t.y+t.h)*s, w=t.w*s, h=t.h*s, col=colour(t.a);
+    g.fillStyle=col; g.globalAlpha=(i===tiles.length-1&&!done)?0.95:0.62; g.fillRect(x,y,w,h); g.globalAlpha=1;
+    g.strokeStyle="#081a2e"; g.lineWidth=Math.max(0.6,Math.min(1.6,s*0.12))*d; g.strokeRect(x,y,w,h);
+    const lab=t.a+"×"+t.b, tw=g.measureText(lab).width;
+    if(h>12*d&&tw<w-4*d){ g.fillStyle="#081a2e"; g.fillText(lab,x+w/2,y+h/2); }
+  });
+  g.textAlign="left"; g.textBaseline="alphabetic";
+  const last=tiles[tiles.length-1];
+  $("readT").textContent="Tiles placed: "+tiles.length+" of "+order.length+(done?"  (finished)":"")+".  Latest: "+last.a+"×"+last.b+" = "+(last.a*last.b)+
+    (idx<order.length?".  Next: "+order[idx][0]+"×"+order[idx][1]:"")+".";
+  drawG();
+}
+function drawG(){
+  const {g,w:W,h:H,d}=fit($("cvG"));
+  const pad=8*d, n=Math.max(2,dens.length);
+  g.strokeStyle=C.grid; g.lineWidth=1; for(const v of [0.25,0.5,0.75]){ const y=H-pad-(H-2*pad)*v; g.beginPath(); g.moveTo(pad,y); g.lineTo(W-pad,y); g.stroke(); }
+  g.fillStyle=C.muted; g.font=(10*d)+"px "+MONO; g.fillText("100%",pad,pad+8*d); g.fillText("50%",pad,H-pad-(H-2*pad)*0.5-3*d);
+  g.strokeStyle=C.brass; g.lineWidth=1.6*d; g.beginPath();
+  dens.forEach((v,i)=>{ const x=pad+(W-2*pad)*i/(maxT-1), y=H-pad-(H-2*pad)*Math.min(1,v); i?g.lineTo(x,y):g.moveTo(x,y); }); g.stroke();
+  let A=0; for(const t of tiles) A+=t.w*t.h;
+  $("readG").textContent="Covered area "+A+",  disc coverage "+(100*dens[dens.length-1]).toFixed(1)+"%  (tile area ÷ area of the smallest disc around the cluster)";
+}
+function frame(){
+  if(running&&!done){ acc+=(+$("speed").value)/20; let k=0; while(acc>=1&&k<20){ acc-=1; if(!place()) break; k++; } if(k) draw(); if(done){ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); draw(); } }
+  requestAnimationFrame(frame);
+}
+$("run").addEventListener("click",function(){ if(done){reset();} running=!running; this.textContent=running?"Pause":"Run"; this.classList.toggle("on",running); });
+$("stepB").addEventListener("click",()=>{ running=false; $("run").textContent="Run"; $("run").classList.remove("on"); if(place()) draw(); else draw(); });
+$("reset").addEventListener("click",reset);
+$("mPrime").addEventListener("click",function(){ mode="prime"; this.classList.add("on"); $("mAll").classList.remove("on"); reset(); });
+$("mAll").addEventListener("click",function(){ mode="all"; this.classList.add("on"); $("mPrime").classList.remove("on"); reset(); });
+$("maxT").addEventListener("input",function(){ maxT=+this.value; $("maxTv").textContent=maxT; });
+$("maxT").addEventListener("change",reset);
+window.addEventListener("resize",draw);
+if(reduce){ $("run").textContent="Run"; $("run").classList.remove("on"); }
+reset(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

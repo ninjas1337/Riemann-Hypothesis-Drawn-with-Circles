@@ -43,6 +43,12 @@ Every zero ρ is sent to w = 1 − 1/ρ, which maps the critical line onto the u
 
 Every whole number drawn as all of its rectangles a×b at once, centred, equal in area: a little star whose outline is the staircase under the hyperbola xy = n. Primes have only 1×p, so their stars are bare crosses; numbers with many factorisations fill out the hyperbolic shape. The stars sit on a golden-angle (Vogel) or square (Ulam) spiral, so the pattern never repeats. Tap a star to see its rectangles at true scale with the corners on xy = n. The page ends with the Dirichlet divisor problem, the counting wobble of all these rectangles and a sister problem of RH.
 
+## Growing a Tiling from Prime Rectangles
+
+👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/tiles.html**
+
+Every rectangle with two prime sides (2×2, 2×3, 3×3, 2×5, 2×7, 3×5, …), one of each, in order of area, placed greedily where its farthest corner stays closest to the start. A density trace shows how much of the enclosing disc is covered. Every tile is at least 2 wide, so 1-wide cracks stay open forever; switching to every factorisation adds the primes' 1×p strips, which act as mortar and fill them.
+
 ## Mathematical background
 
 The construction is as far as I know new as a picture; but the mathematics behind it is classical. The horizontal position of the n-th centre is essentially twice the sum of the primes up to pₙ, which by the prime number theorem follows 2·li(pₙ²). The fluctuations are described by the explicit formula of Riemann and von Mangoldt, where each zeta zero ρ contributes a wave. Via von Koch's criterion (1901), the Riemann Hypothesis is equivalent to
