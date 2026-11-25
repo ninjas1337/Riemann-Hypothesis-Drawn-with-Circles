@@ -79,6 +79,19 @@ a{color:var(--line)}
 </section>
 
 <section>
+  <h2>Cut the line</h2>
+  <p>The easiest test of all. Lay the unitbricks of the number in one line and try to cut it into equal pieces, each at least 2 long. If a cut works, stack the pieces and you get one of the number's rectangles. If no cut ever works, the number is a prime: it can only lie in a single line.</p>
+  <div class="sheet">
+    <canvas id="cvL" style="aspect-ratio:2.6/1" role="img" aria-label="A line of unitbricks being cut into equal pieces; the pieces stack into a rectangle when the cut works"></canvas>
+    <div class="row">
+      <button id="cutPlay" class="on" type="button">Try cutting</button>
+      <button id="cutNext" type="button">Next cut</button>
+    </div>
+    <p class="read" id="readL"></p>
+  </div>
+</section>
+
+<section>
   <h2>How the building works</h2>
   <p>Write the number as a product of primes, smallest first: 12 = 2 · 2 · 3. Start with a line of 2 unitbricks. Copy it 2 times side by side: a 2×2 plate. Stack 3 of those plates: a 2×2×3 block of twelve unitbricks. Each prime factor is one copying step, in its own direction.</p>
   <p>After three steps every direction is used, so a fourth factor copies the whole block side by side with a small gap, like a module repeated in a building set; a fifth repeats that row of modules, and so on. The number of copying steps is the number of prime factors counted with repetition, the number of directions the number can unfold into.</p>
@@ -211,8 +224,45 @@ function describe(kMax,tMax){
   lines.push("Finished: "+fin+".");
   $("read").textContent=lines.join("\n");
 }
-function setN(v){ N=Math.max(2,Math.min(1000,Math.round(v)||2)); $("n").value=N; F=factor(N); buildLayout(); stepK=0; copyT=1; showAll=false; acc=0; playing=!reduce; $("play").classList.toggle("on",playing); $("play").textContent=playing?"Pause":"Assemble"; if(F.length===1){ showAll=true; } draw(); }
+/* ---------- cut the line ---------- */
+let cutK=2, cutPlaying=!reduce, cutAcc=0, cutDone=false, cutWorks=[];
+function cutReset(){ cutK=2; cutAcc=0; cutWorks=[]; cutDone=Math.floor(N/2)<2; cutPlaying=!reduce&&!cutDone; $("cutPlay").textContent=cutPlaying?"Pause":"Try cutting"; $("cutPlay").classList.toggle("on",cutPlaying); if(!cutDone&&N%cutK===0) cutWorks.push(cutK); drawCut(); }
+function cutStep(){ if(cutDone) return; if(cutK+1>Math.floor(N/2)){ cutDone=true; cutPlaying=false; $("cutPlay").textContent="Try again"; $("cutPlay").classList.remove("on"); } else { cutK++; if(N%cutK===0) cutWorks.push(cutK); } drawCut(); }
+function drawCut(){
+  const {g,w:W,h:H,d}=fit($("cvL"));
+  g.font=(13*d)+"px "+MONO; g.fillStyle="#e8eef5";
+  if(N>120){ g.fillStyle="#9fb3c8"; g.fillText("The cutting test is shown for numbers up to 120. Try a smaller one!",14*d,H/2); $("readL").textContent=""; return; }
+  const pad=14*d, k=cutDone?null:cutK, pieces=k?Math.floor(N/k):0, left=k?N%k:0;
+  const gapPx=k?Math.max(2*d,Math.min(8*d,(W-2*pad)/N*0.4)):0, nGaps=k?Math.ceil(N/k)-1:0;
+  const u=Math.min(26*d,(W-2*pad-nGaps*gapPx)/N), y0=22*d, x0=(W-(N*u+nGaps*gapPx))/2;
+  const say=(t,y,col,size)=>{ let f=size*d; g.font="bold "+f+"px "+MONO; while(g.measureText(t).width>W-2*pad&&f>9*d){ f-=1*d; g.font="bold "+f+"px "+MONO; } g.fillStyle=col; g.textAlign="center"; g.fillText(t,W/2,y); g.textAlign="left"; };
+  const C1="#2f6fd0", C2="#f2c94c", LEFT="#d6382c", NEU="#cdd5de";
+  for(let i=0;i<N;i++){
+    const j=k?Math.floor(i/k):0, x=x0+i*u+(k?j*gapPx:0);
+    let col=NEU; if(k){ col=(j<pieces)?(j%2?C2:C1):LEFT; }
+    g.fillStyle=col; g.fillRect(x,y0,u-1*d,u-1*d);
+    if(u>9*d){ g.fillStyle="rgba(255,255,255,0.35)"; g.beginPath(); g.arc(x+u/2,y0+u/2,u*0.26,0,2*Math.PI); g.fill(); }
+  }
+  let msg="";
+  if(k){
+    if(left===0){
+      msg="Cut into "+k+"s: "+pieces+" pieces, nothing left over ✓  Stack them: "+N+" = "+k+" × "+pieces;
+      const v=Math.min(24*d,(H-y0-u-40*d)/pieces, (W-2*pad)/k), rx=W/2-k*v/2, ry=y0+u+26*d;
+      for(let r=0;r<pieces;r++) for(let c=0;c<k;c++){ g.fillStyle=r%2?C2:C1; g.fillRect(rx+c*v,ry+r*v,v-1*d,v-1*d); }
+    } else {
+      msg="Cut into "+k+"s: "+pieces+" piece"+(pieces===1?"":"s")+" and "+left+" left over ✗";
+      say(left+" left over, no good",y0+u+48*d,"#d6382c",16);
+    }
+  } else {
+    if(cutWorks.length===0) say(N+" can't be cut into equal pieces: it is a prime!",y0+u+52*d,"#f08a2b",18);
+    else say(N+" can be cut into equal pieces: it is a composite.",y0+u+52*d,"#a7e3a1",18);
+  }
+  const works=cutWorks.length?("Cuts that work so far: "+cutWorks.map(v=>v+"s").join(", ")):"No cut has worked so far.";
+  $("readL").textContent=(msg?msg+"\n":"")+(cutDone&&cutWorks.length===0?"Every try left something over. "+N+" can only lie in one single line.":works);
+}
+function setN(v){ N=Math.max(2,Math.min(1000,Math.round(v)||2)); $("n").value=N; F=factor(N); buildLayout(); stepK=0; copyT=1; showAll=false; acc=0; playing=!reduce; $("play").classList.toggle("on",playing); $("play").textContent=playing?"Pause":"Assemble"; if(F.length===1){ showAll=true; } draw(); cutReset(); }
 function tick(){
+  if(cutPlaying&&!cutDone){ cutAcc+=(+$("speed").value)/240; if(cutAcc>=1){ cutAcc=0; cutStep(); } }
   if(playing&&!showAll){ acc+=(+$("speed").value)/60; if(acc>=1){ acc=0;
       if(copyT<F[stepK]) copyT++; else if(stepK<F.length-1){ stepK++; copyT=1; } else { playing=false; $("play").textContent="Assemble"; $("play").classList.remove("on"); }
       draw(); } }
@@ -228,6 +278,9 @@ $("rich").addEventListener("click",()=>{const i=RICH.findIndex(v=>v>N);setN(RICH
 $("play").addEventListener("click",function(){ if(showAll||(stepK===F.length-1&&copyT===F[F.length-1])){ stepK=0; copyT=1; showAll=false; } playing=!playing; this.textContent=playing?"Pause":"Assemble"; this.classList.toggle("on",playing); draw(); });
 $("whole").addEventListener("click",()=>{ showAll=true; playing=false; $("play").textContent="Assemble"; $("play").classList.remove("on"); draw(); });
 window.addEventListener("resize",draw);
+$("cutPlay").addEventListener("click",function(){ if(cutDone){ cutReset(); cutPlaying=true; } else cutPlaying=!cutPlaying; this.textContent=cutPlaying?"Pause":"Try cutting"; this.classList.toggle("on",cutPlaying); });
+$("cutNext").addEventListener("click",()=>{ cutPlaying=false; $("cutPlay").textContent="Try cutting"; $("cutPlay").classList.remove("on"); cutStep(); });
+window.addEventListener("resize",drawCut);
 setN(12); requestAnimationFrame(tick);
 })();
 </script>

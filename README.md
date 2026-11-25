@@ -59,7 +59,7 @@ Every rectangle of every factorisation (both sides at least 2) laid side by side
 
 👉 **https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/bricks.html**
 
-Every number is made of unitbricks (1). A prime is a number whose unitbricks can only lie in one single line; every other number folds into a block whose edges are prime lines, and into exactly one such block. Pick a number and watch it assemble in 3D: start with a line of p unitbricks for the smallest prime factor, then one copying step per further prime factor (side by side, in rows, stacked up, then whole blocks repeated with gaps). Each prime keeps one colour: its line, the edge it sets and the copies it makes. 12 = 2·2·3 becomes a 2×2×3 block; 359 stays a single line.
+Every number is made of unitbricks (1). A prime is a number whose unitbricks can only lie in one single line; every other number folds into a block whose edges are prime lines, and into exactly one such block. Pick a number and watch it assemble in 3D: start with a line of p unitbricks for the smallest prime factor, then one copying step per further prime factor (side by side, in rows, stacked up, then whole blocks repeated with gaps). Each prime keeps one colour: its line, the edge it sets and the copies it makes. 12 = 2·2·3 becomes a 2×2×3 block; 359 stays a single line. A "Cut the line" panel, made for kids, lays the unitbricks in one line and tries to cut it into equal pieces of 2, 3, 4, …: every cut that works stacks into a rectangle, and for a prime every try leaves something over.
 
 ## Mathematical background
 
