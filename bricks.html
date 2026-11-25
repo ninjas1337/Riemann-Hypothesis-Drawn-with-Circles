@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Numbers Built from Bricks</title>
-<meta name="description" content="Every number assembled from toy bricks: a prime is a single 1×p brick, a composite is built by copying, one copy step per prime factor. 12 = a 1×2 brick, copied into a 2×2 plate, stacked into a 2×2×3 block.">
-<meta property="og:title" content="Numbers Built from Bricks">
-<meta property="og:description" content="Primes are single bricks; every other number is assembled by copying.">
+<title>Numbers Built from Unitbricks</title>
+<meta name="description" content="Every number is made of unitbricks. A prime can only lie as one single line of them; every other number folds into a block whose edges are prime lines. 12 is a 2×2×3 block of twelve unitbricks.">
+<meta property="og:title" content="Numbers Built from Unitbricks">
+<meta property="og:description" content="Primes are single lines of unitbricks; every other number folds into a block with prime edges.">
 <meta property="og:image" content="https://ninjas1337.github.io/Riemann-Hypothesis-Drawn-with-Circles/preview.png">
 <meta name="author" content="Sanjin Redzic">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,8 +54,8 @@ a{color:var(--line)}
 <main>
 <div>
   <a class="back" href="line.html">← The factorisation line</a>
-  <h1>Numbers built from bricks, <em>primes as single bricks</em></h1>
-  <p class="lede">The primes are the bricks themselves. The box contains only prime bricks, 2, 3, 5, 7, 11, …, and every other number is something you build from them: each prime brick sets one edge of the finished block. 12 is built from the kit 2, 2, 3. Every number has exactly one kit, and a prime is a kit with a single brick in it.</p>
+  <h1>Numbers built from unitbricks, <em>primes as single lines</em></h1>
+  <p class="lede">Every number is made of unitbricks, the single 1-blocks. A prime is a number whose unitbricks can only lie in one single line: there is no way to fold them into a rectangle. Every other number folds into a block, and the edges of that block are prime lines. 12 folds into a 2 × 2 × 3 block of twelve unitbricks, with edges 2, 2 and 3. Every number has exactly one such set of prime edges.</p>
 </div>
 
 <section>
@@ -68,7 +68,7 @@ a{color:var(--line)}
       <button id="nextC" type="button">Next composite</button>
       <button id="rich" type="button">Rich number</button>
     </div>
-    <canvas id="cv" role="img" aria-label="The chosen number assembled from bricks in three dimensions"></canvas>
+    <canvas id="cv" role="img" aria-label="The chosen number assembled from unitbricks in three dimensions"></canvas>
     <div class="row">
       <button id="play" class="on" type="button">Assemble</button>
       <button id="whole" type="button">Show finished block</button>
@@ -80,14 +80,14 @@ a{color:var(--line)}
 
 <section>
   <h2>How the building works</h2>
-  <p>Write the number as a product of primes, smallest first: 12 = 2 · 2 · 3. Start with one brick of length 2. Copy it 2 times side by side: a 2×2 plate. Stack 3 of those plates: a 2×2×3 block of twelve studs. Each prime factor is one copying step, in its own direction.</p>
+  <p>Write the number as a product of primes, smallest first: 12 = 2 · 2 · 3. Start with a line of 2 unitbricks. Copy it 2 times side by side: a 2×2 plate. Stack 3 of those plates: a 2×2×3 block of twelve unitbricks. Each prime factor is one copying step, in its own direction.</p>
   <p>After three steps every direction is used, so a fourth factor copies the whole block side by side with a small gap, like a module repeated in a building set; a fifth repeats that row of modules, and so on. The number of copying steps is the number of prime factors counted with repetition, the number of directions the number can unfold into.</p>
-  <div class="callout"><p>The primes are the bricks; every other number is a build. Each number comes with exactly one kit of prime bricks, and so exactly one finished block with prime edges: that is the fundamental theorem of arithmetic, in plastic.</p></div>
-  <p>Order does not matter for the finished shape: copying 3 times and then 2 times gives the same block as 2 and then 3, just turned. Try the rich numbers like 360 = 2·2·2·3·3·5 or 720, with six or seven copy steps, against a prime like 359 next to them, which stays a single brick.</p>
+  <div class="callout"><p>Everything is made of unitbricks. The primes are the numbers whose unitbricks can only lie in a single line; every other number folds into a block whose edges are prime lines, and into exactly one such block. That is the fundamental theorem of arithmetic, in plastic.</p></div>
+  <p>Order does not matter for the finished shape: copying 3 times and then 2 times gives the same block as 2 and then 3, just turned. Try the rich numbers like 360 = 2·2·2·3·3·5 or 720, with six or seven copy steps, against a prime like 359 next to them, which stays a single line of 359 unitbricks.</p>
 </section>
 
 <footer>
-  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a> · <a href="line.html">The factorisation line</a>. Studs are drawn as unit cubes in isometric view. Each prime has one colour: its brick in the kit, the edge of the block it sets, and the copies it makes while the block is assembled.</p>
+  <p>Concept: Sanjin Redzic. Code written with Claude (Anthropic). Part of <a href="index.html">The Riemann Hypothesis, drawn with circles</a> · <a href="factors.html">Every number as rectangles</a> · <a href="line.html">The factorisation line</a>. Unitbricks are drawn as cubes in isometric view. Each prime has one colour: its line at the top, the edge of the block it sets, and the copies it makes while the block is assembled.</p>
   <ol>
     <li>Euclid, <i>Elements</i>, Book VII, Props. 30–32, and Book IX, Prop. 14.</li>
     <li>C. F. Gauss, <i>Disquisitiones Arithmeticae</i>, 1801, art. 16 (uniqueness of prime factorisation).</li>
@@ -178,14 +178,14 @@ function draw(){
     else { A=[Ex[0]+off,-off,0]; B=[Ex[0]+off,-off,Ex[2]]; al="left"; dx=10*d; dy=0; }
     m=line(A,B,c,2*d); lab("×"+F[k],m[0]+dx,m[1]+dy,c,al);
   }
-  g.fillStyle="#9fb3c8"; g.font=(12*d)+"px "+MONO; g.fillText(cs.length+" studs",10*d,H-10*d);
+  g.fillStyle="#9fb3c8"; g.font=(12*d)+"px "+MONO; g.fillText(cs.length+" unitbricks",10*d,H-10*d);
   drawKit(g,W,d,kMax,finished);
   describe(kMax,tMax);
 }
 function primeIndex(p){let c=0;for(let q=2;q<p;q++) if(isPrime(q)) c++;return c;}
 function drawKit(g,W,d,kMax,finished){ // the prime bricks this number is built from, as loose pieces; the one in use is ringed
   const u=13*d; let x=10*d, y=14*d;
-  g.font=(11*d)+"px "+MONO; g.fillStyle="#9fb3c8"; g.fillText("kit:",x,y+0.75*u); x+=34*d;
+  g.font=(11*d)+"px "+MONO; g.fillStyle="#9fb3c8"; g.fillText("prime lines:",x,y+0.75*u); x+=92*d;
   F.forEach((p,k)=>{
     const len=Math.min(p,14), w=len*u, col=PAL[primeIndex(p)%PAL.length];
     if(x+w>W-10*d){ x=44*d; y+=2.4*u; }
@@ -199,9 +199,9 @@ function drawKit(g,W,d,kMax,finished){ // the prime bricks this number is built 
 const AX=["side by side","in rows","stacked up"];
 function describe(kMax,tMax){
   const K=F.length;
-  if(K===1){ $("read").textContent=N+" is prime: it is a brick itself, a single 1×"+N+". It cannot be built from other bricks."; return; }
-  const lines=[N+" = "+F.join(" · ")+"   kit: "+F.join(", ")+"   ("+K+" bricks)"];
-  lines.push("Start: one 1×"+F[0]+" brick.");
+  if(K===1){ $("read").textContent=N+" is prime: its "+N+" unitbricks can only lie in one single line. They cannot be folded into a rectangle."; return; }
+  const lines=[N+" = "+F.join(" · ")+"   prime lines: "+F.join(", ")];
+  lines.push("Start: a line of "+F[0]+" unitbricks.");
   for(let k=1;k<K;k++){
     const lvl=Math.floor(k/3), what=k<3?(k===1?"copy it":"copy that"):"copy the whole "+(lvl===1?"block":"group");
     const st=(k<kMax||(k===kMax&&tMax===F[k]))?"✓":(k===kMax?"…":" ");
